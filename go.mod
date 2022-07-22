@@ -1,4 +1,4 @@
-module backend
+module github.com/MMukhtarDwiPutra/HelloCoffee-with-golang
 
 go 1.18
 
@@ -7,4 +7,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 )
 
-require github.com/felixge/httpsnoop v1.0.1 // indirect
+require (
+	github.com/felixge/httpsnoop v1.0.1 // indirect
+	github.com/go-sql-driver/mysql v1.6.0 // indirect
+)
