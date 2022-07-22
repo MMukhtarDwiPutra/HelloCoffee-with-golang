@@ -10,7 +10,7 @@ func NewDataAkun() *AkunStore{
 	passwordDefault := ""
 
 	return &AkunStore{
-		nama := namaDefault,
-		password := passwordDefault,
+		nama = namaDefault,
+		password = passwordDefault,
 	}
 }
