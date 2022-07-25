@@ -10,14 +10,11 @@ import (
 	// "github.com/gorilla/mux"
 	"github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/model"
 	_ "github.com/go-sql-driver/mysql"
+	"os"
 )
 
 type AkunStore struct{
 	data []model.Akun
-}
-
-type TokoStore struct{
-	data []model.Toko
 }
 
 func NewDataAkun() *AkunStore{
@@ -61,14 +58,24 @@ func (as *AkunStore) LoginHandler(w http.ResponseWriter, r *http.Request){
 func (as *AkunStore) RegisterHandler(w http.ResponseWriter, r *http.Request){}
 
 func (as *AkunStore) HomeHandler(w http.ResponseWriter, r *http.Request){
-	data := TokoStore{}
+	data := make([]model.Toko,0)
 	path, _ := os.Getwd()
-	t, err := template.ParseFiles(path+`\views\home.html`)
+	t, err := template.ParseFiles(path+`\backend\views\home.html`)
 
 	db := connectDb()
 	rows, err := db.Query(`SELECT * FROM daftar_toko`)
-	for rows.Next(){
-		data = append(data, rows)
+	for i :=0 ; rows.Next() ; i++{
+		err = rows.Scan(&nama_toko, &id_toko, &alamat, &foto, &id_user)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		data = append(data, model.Toko{
+			Nama_toko: nama_toko,
+			Id_toko : id_toko,
+			Alamat : alamat,
+			Foto : foto,
+			Id_user : id_user})
 	}
 
 	fmt.Println(err)

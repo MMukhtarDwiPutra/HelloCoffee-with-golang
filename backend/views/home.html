@@ -14,9 +14,7 @@
 		<div class="container">
 			<div class="row">
 				<!-- COFFEE CARD -->
-				<?php define('i', 0);?>
-				<?php foreach ($toko as $data) : ?>
-					<?php if(i <= 2): ?>
+				<{{ .range}}
 					<div class="col-12 col-md-6 col-lg-4">
 						<form method="post" action="" method="post" accept-charset="utf-8">
 							<article class="card-wrapper text-dark text-center">
@@ -30,9 +28,9 @@
 							<div class="product-description">
 								<!-- title -->
 								<div class="card-body pt-2 pb-2">
-									<h5 class="card-title mb-3"><?php echo $data['nama_toko'] ?></h5>
+									<h5 class="card-title mb-3">{{ .nama_toko}}</h5>
 									<hr class="mb-2 mt-0">
-									<p class="card-text"><?php echo $data['alamat'] ?></p>
+									<p class="card-text">{{ .alamat}}</p>
 								</div>
 								<a href="<?php ?>" class="btn btn-primary float-right ">Detail</a>	
 								<input type="hidden" name="id_toko" value="<?php echo $data['id_toko']; ?>" />
@@ -42,8 +40,7 @@
 						</article>
 					</form>
 				</div>
-				<?php endif; ?>
-			<?php endforeach; ?>
+			{{end}}
 			<!-- end COFFEE CARD -->
 		</div>
 	</div>

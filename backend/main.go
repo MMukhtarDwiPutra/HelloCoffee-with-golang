@@ -6,7 +6,6 @@ import (
 	// "io/fs"
 	"log"
 	"net/http"
-	"path"
 
 	"github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/backend/akun"
 	// "github.com/gorilla/handlers"
@@ -25,11 +24,11 @@ func main(){
 	router.HandleFunc("/home", dataAkun.HomeHandler)
 	router.HandleFunc("/", LoginHandler)
 
+	log.Println("SERVER is running at port 8080")
 	err := http.ListenAndServe(":8080", router)
 	if err == nil{
 		log.Fatal(err)
 	}
-	log.Println("SERVER is running at port 8080")
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request){
@@ -51,7 +50,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request){
 
 func LoginHandler(w http.ResponseWriter, r *http.Request){
 	path, _ := os.Getwd()
-	tmplt, err := template.ParseFiles(path+`\views\login.html`)
+	tmplt, err := template.ParseFiles(path+`\backend\views\login.html`)
 	if err != nil{
 		log.Println(err)
 		http.Error(w, "Error is happening", http.StatusInternalServerError)
