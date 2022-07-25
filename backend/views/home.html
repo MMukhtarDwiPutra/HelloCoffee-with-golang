@@ -1,4 +1,5 @@
-	
+{{template "layout" .}}
+{{define "main"}}
 <div class="jumbotron text-white rounded-0 " style="background-image: url('https://images.wallpaperscraft.com/image/coffee_book_windowsill_130911_1920x1080.jpg'); height: 650px; width: 100%;">
 	<div class="container">
 		<h1 class="mt-5 pt-5">Hello Coffee</h1>      
@@ -14,7 +15,7 @@
 		<div class="container">
 			<div class="row">
 				<!-- COFFEE CARD -->
-				{{ .range}}
+				{{range .}}
 					<div class="col-12 col-md-6 col-lg-4">
 						<form method="post" action="" method="post" accept-charset="utf-8">
 							<article class="card-wrapper text-dark text-center">
@@ -22,15 +23,15 @@
 								<div class="image-holder">	<a href="<?php echo base_url('Detail_toko/') ?>" class="image-holder__link"></a>
 
 									<div class="image-liquid image-holder--original"
-									style="background-image: url('<?php echo base_url('assets/img/{{.foto}})">
+									style="background-image: url('<?php echo base_url('assets/img/{{.Foto}})">
 								</div>
 							</div>
 							<div class="product-description">
 								<!-- title -->
 								<div class="card-body pt-2 pb-2">
-									<h5 class="card-title mb-3">{{ .nama_toko}}</h5>
+									<h5 class="card-title mb-3">{{ .Nama_toko}}</h5>
 									<hr class="mb-2 mt-0">
-									<p class="card-text">{{ .alamat}}</p>
+									<p class="card-text">{{ .Alamat}}</p>
 								</div>
 								<a href="<?php ?>" class="btn btn-primary float-right ">Detail</a>	
 								<input type="hidden" name="id_toko" value="<?php echo $data['id_toko']; ?>" />
@@ -122,3 +123,4 @@
 
 		</ul>
 	</section>
+{{end}}

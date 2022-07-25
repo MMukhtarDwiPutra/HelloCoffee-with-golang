@@ -1,7 +1,7 @@
 package akun
 
 import (
-	"fmt"
+	// "fmt"
 	"log"
 	"net/http"
 	"database/sql"
@@ -58,18 +58,25 @@ func (as *AkunStore) LoginHandler(w http.ResponseWriter, r *http.Request){
 func (as *AkunStore) RegisterHandler(w http.ResponseWriter, r *http.Request){}
 
 func (as *AkunStore) HomeHandler(w http.ResponseWriter, r *http.Request){
-	data := make([]model.Toko,0)
-	path, _ := os.Getwd()
-	t, _ := template.ParseFiles(path+`\backend\views\home.html`)
+	var data []model.Toko
 
 	db := connectDb()
-	rows, _ := db.Query(`SELECT "nama_toko", "id_toko", "alamat","foto", "id_user" FROM daftar_toko`)
-	var toko model.Toko
-	for i :=0 ; rows.Next() ; i++{
-		rows.Scan(&toko.nama_toko, &toko.id_toko, &toko.alamat, &toko.foto, &toko.id_user)
+	rows, _ := db.Query(`SELECT nama_toko, id_toko, alamat, foto, id_user FROM daftar_toko`)
+	
+	for rows.Next(){
+		var toko model.Toko
+		rows.Scan(&toko.Nama_toko, &toko.Id_toko, &toko.Alamat, &toko.Foto, &toko.Id_user)
 
 		data = append(data, toko)
 	}
 
-	fmt.Println(t.Execute(w,data))
+	path, _ := os.Getwd()
+	t, err := template.ParseFiles(path+`\backend\views\layout.html`,path+`\backend\views\home.html`)
+	if err != nil{
+		log.Fatal(err)
+	}
+	err = t.Execute(w,data)
+	if err != nil {
+		log.Fatal(err)
+	}
 }

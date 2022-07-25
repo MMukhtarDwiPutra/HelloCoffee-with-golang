@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/backend/akun"
+	// "github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/model"
 	// "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"os"
@@ -29,23 +30,6 @@ func main(){
 	if err == nil{
 		log.Fatal(err)
 	}
-}
-
-func homeHandler(w http.ResponseWriter, r *http.Request){
-	path, _ := os.Getwd()
-	tmplt, err := template.ParseFiles(path+`\views\home.html`)
-	if err != nil{
-		log.Println(err)
-		http.Error(w, "Error is happening", http.StatusInternalServerError)
-		return
-	}
-
-	err = tmplt.Execute(w, nil)
-	if err != nil{
-		log.Println(err)
-		http.Error(w, "Error is happening", http.StatusInternalServerError)
-		return
-	}	
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request){
