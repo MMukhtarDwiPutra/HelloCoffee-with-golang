@@ -16,6 +16,10 @@ type AkunStore struct{
 	data []model.Akun
 }
 
+type TokoStore struct{
+	data []model.Toko
+}
+
 func NewDataAkun() *AkunStore{
 	newData := make([]model.Akun, 0)
 
@@ -57,8 +61,16 @@ func (as *AkunStore) LoginHandler(w http.ResponseWriter, r *http.Request){
 func (as *AkunStore) RegisterHandler(w http.ResponseWriter, r *http.Request){}
 
 func (as *AkunStore) HomeHandler(w http.ResponseWriter, r *http.Request){
-	p := map[string]interface{}{}
-	t, err := template.ParseFiles("C:/Users/USER/Desktop/Pemrograman/Golang/HelloCoffee-with-golang/backend/views/home.html")
+	data := TokoStore{}
+	path, _ := os.Getwd()
+	t, err := template.ParseFiles(path+`\views\home.html`)
+
+	db := connectDb()
+	rows, err := db.Query(`SELECT * FROM daftar_toko`)
+	for rows.Next(){
+		data = append(data, rows)
+	}
+
 	fmt.Println(err)
-	fmt.Println(t.Execute(w,p))
+	fmt.Println(t.Execute(w,data))
 }

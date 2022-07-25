@@ -11,6 +11,7 @@ import (
 	"github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/backend/akun"
 	// "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"os"
 )
 
 func main(){
@@ -32,7 +33,8 @@ func main(){
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request){
-	tmplt, err := template.ParseFiles(path.Join("views", "home.html"))
+	path, _ := os.Getwd()
+	tmplt, err := template.ParseFiles(path+`\views\home.html`)
 	if err != nil{
 		log.Println(err)
 		http.Error(w, "Error is happening", http.StatusInternalServerError)
@@ -48,7 +50,8 @@ func homeHandler(w http.ResponseWriter, r *http.Request){
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request){
-	tmplt, err := template.ParseFiles("C:/Users/USER/Desktop/Pemrograman/Golang/HelloCoffee-with-golang/backend/views/login.html")
+	path, _ := os.Getwd()
+	tmplt, err := template.ParseFiles(path+`\views\login.html`)
 	if err != nil{
 		log.Println(err)
 		http.Error(w, "Error is happening", http.StatusInternalServerError)
