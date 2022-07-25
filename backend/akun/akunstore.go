@@ -60,24 +60,16 @@ func (as *AkunStore) RegisterHandler(w http.ResponseWriter, r *http.Request){}
 func (as *AkunStore) HomeHandler(w http.ResponseWriter, r *http.Request){
 	data := make([]model.Toko,0)
 	path, _ := os.Getwd()
-	t, err := template.ParseFiles(path+`\backend\views\home.html`)
+	t, _ := template.ParseFiles(path+`\backend\views\home.html`)
 
 	db := connectDb()
-	rows, err := db.Query(`SELECT * FROM daftar_toko`)
+	rows, _ := db.Query(`SELECT "nama_toko", "id_toko", "alamat","foto", "id_user" FROM daftar_toko`)
+	var toko model.Toko
 	for i :=0 ; rows.Next() ; i++{
-		err = rows.Scan(&nama_toko, &id_toko, &alamat, &foto, &id_user)
-		if err != nil {
-			log.Fatal(err)
-		}
+		rows.Scan(&toko.nama_toko, &toko.id_toko, &toko.alamat, &toko.foto, &toko.id_user)
 
-		data = append(data, model.Toko{
-			Nama_toko: nama_toko,
-			Id_toko : id_toko,
-			Alamat : alamat,
-			Foto : foto,
-			Id_user : id_user})
+		data = append(data, toko)
 	}
 
-	fmt.Println(err)
 	fmt.Println(t.Execute(w,data))
 }
