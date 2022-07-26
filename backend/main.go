@@ -23,7 +23,17 @@ func main(){
 	router.HandleFunc("/akun/login", dataAkun.LoginHandler)
 	router.HandleFunc("/akun/register", dataAkun.RegisterHandler)
 	router.HandleFunc("/home", dataAkun.HomeHandler)
+	router.HandleFunc("/akun/registration", dataAkun.RegisterNewAccount)
 	router.HandleFunc("/", LoginHandler)
+	router.HandleFunc("/akun/pengaturan/", dataAkun.SettingHandler)
+	router.HandleFunc("/logout", dataAkun.LogoutHandler)
+	router.HandleFunc("/akun/pengaturan/deleteAkun/", dataAkun.DeleteAkun)
+	router.HandleFunc("/akun/pengaturan/edit/", dataAkun.EditAkunHandler)
+	router.HandleFunc("/akun/pengaturan/edit/process/",dataAkun.EditAkun)
+	router.HandleFunc("/akun/pengaturan/edit/password/", dataAkun.EditPasswordHandler)
+	router.HandleFunc("/akun/pengaturan/edit/password/process/",dataAkun.EditPassword)
+
+	// http.Handle("/css/", http.StripPrefix("C:/Users/USER/Desktop/Pemrograman/Golang/HelloCoffee-with-golang/backend/views/css/", http.FileServer(http.Dir("C:/Users/USER/Desktop/Pemrograman/Golang/HelloCoffee-with-golang/backend/views/css"))))
 
 	log.Println("SERVER is running at port 8080")
 	err := http.ListenAndServe(":8080", router)

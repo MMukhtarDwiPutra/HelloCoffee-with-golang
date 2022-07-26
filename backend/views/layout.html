@@ -10,7 +10,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <link rel="stylesheet" href="C:/Users/USER/Desktop/Pemrograman/Golang/HelloCoffee-with-golang/backend/views/css/style.css">
+  <link rel="stylesheet" href="css/style.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
@@ -36,11 +36,11 @@
                </div>
                <div class="menu text-uppercase">
                   <ul>
-                     <li><a href="<?php if($_SESSION['id_toko']!=0){echo base_url('timeline/toko');}else{echo base_url('timeline');} ?>">Home</a></li>
+                     <li><a href="/home">Home</a></li>
                      <li><a href="#menu">Menu</a></li>
                      <li><a href="<?php echo base_url('shopping/keranjang')?>">Keranjang</a></li>
-                     <li><a href="<?php echo base_url('home/logout') ?>">Logout</a></li>
-                     <li><a href="<?php echo base_url('Akun/pengaturanAkun/').($_SESSION['id_user']) ?>">akun</a></li>
+                     <li><a href="/logout">Logout</a></li>
+                     <li><a href="/akun/pengaturan/?id={{.Id_user}}">akun</a></li>
                   </ul>
                </div>
             </nav>
