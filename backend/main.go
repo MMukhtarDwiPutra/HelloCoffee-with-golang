@@ -32,6 +32,9 @@ func main(){
 	router.HandleFunc("/akun/pengaturan/edit/process/",dataAkun.EditAkun)
 	router.HandleFunc("/akun/pengaturan/edit/password/", dataAkun.EditPasswordHandler)
 	router.HandleFunc("/akun/pengaturan/edit/password/process/",dataAkun.EditPassword)
+	router.HandleFunc("/toko/", dataAkun.DetailTokoHandler)
+	router.HandleFunc("/menu", dataAkun.MenuHandler)
+	router.HandleFunc("/menu/detail/", dataAkun.DetailMenu)
 
 	// http.Handle("/css/", http.StripPrefix("C:/Users/USER/Desktop/Pemrograman/Golang/HelloCoffee-with-golang/backend/views/css/", http.FileServer(http.Dir("C:/Users/USER/Desktop/Pemrograman/Golang/HelloCoffee-with-golang/backend/views/css"))))
 

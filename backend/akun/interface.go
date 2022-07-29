@@ -15,4 +15,7 @@ type DataAkun interface{
 	EditAkun(w http.ResponseWriter, r *http.Request)
 	EditPasswordHandler(w http.ResponseWriter, r *http.Request)
 	EditPassword(w http.ResponseWriter, r *http.Request)
+	DetailTokoHandler(w http.ResponseWriter, r *http.Request)
+	MenuHandler(w http.ResponseWriter, r *http.Request)
+	DetailMenu(w http.ResponseWriter, r *http.Request)
 }

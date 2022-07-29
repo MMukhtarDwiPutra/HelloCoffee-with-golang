@@ -14,9 +14,15 @@ import (
 	"os"
 )
 
-type DataStore struct{
+type DataTokoStore struct{
 	Id_user int
 	datastore []model.Toko
+}
+
+type MenuStore struct{
+	Id_user int
+	datastore []model.Menu
+	komentar []model.Komentar
 }
 
 type AkunStore struct{
@@ -99,15 +105,117 @@ func (as *AkunStore) RegisterHandler(w http.ResponseWriter, r *http.Request){
 	}	
 }
 
+func (as *AkunStore) DetailMenu(w http.ResponseWriter, r *http.Request){
+	store := sessions.NewCookieStore([]byte("super-secret"))
+	session, err := store.Get(r, "session-name")
+	data := MenuStore{}
+
+	id_menu := r.URL.Query()["id"][0]
+	data.Id_user = session.Values["id_user"].(int)
+	db := connectDb()
+
+
+	rows, _ := db.Query(`SELECT m.id_menu, m.nama_menu, m.harga, m.deskripsi, m.jenis, m.foto_kopi, dt.nama_toko 
+		FROM menu as m 
+		JOIN daftar_toko as dt ON dt.id_toko = m.id_toko 
+		WHERE m.id_menu = ?`,id_menu)
+	for rows.Next(){
+		var menu model.Menu
+		rows.Scan(&menu.Id_menu, &menu.Nama_menu, &menu.Harga, &menu.Deskripsi, &menu.Jenis, &menu.Foto, &menu.Nama_toko)
+
+		data.datastore = append(data.datastore, menu)
+	}
+
+	rows, _ = db.Query(`SELECT id_user, nama_komentar, isi_komentar FROM komentar WHERE id_menu = ?`, id_menu)	
+
+	for rows.Next(){
+		var komentar model.Komentar
+		rows.Scan(&komentar.IdUser, &komentar.NamaKomentar, &komentar.IsiKomentar)
+
+		data.komentar = append(data.komentar, komentar)
+	}
+
+	path, _ := os.Getwd()
+	t, err := template.ParseFiles(path+`\backend\views\layout.html`,path+`\backend\views\detail_menu.html`)
+	if err != nil{
+		log.Fatal(err)
+	}
+
+	tmp := map[string]interface{}{
+    	"Id_user" : data.Id_user,
+    	"datastore" : data.datastore,
+    	"komentar" : data.komentar,
+    }
+	err = t.Execute(w, tmp)
+	if err != nil{
+		log.Fatal(err)
+	}
+}
+
+func (as *AkunStore) MenuHandler(w http.ResponseWriter, r *http.Request){
+	store := sessions.NewCookieStore([]byte("super-secret"))
+	session, err := store.Get(r, "session-name")
+	data := MenuStore{}
+
+	data.Id_user = session.Values["id_user"].(int)
+	db := connectDb()
+
+	rows, _ := db.Query(`SELECT m.id_menu, m.nama_menu, m.harga, m.deskripsi, m.jenis, m.foto_kopi, dt.nama_toko 
+		FROM menu as m 
+		JOIN daftar_toko as dt ON dt.id_toko = m.id_toko`)
+	for rows.Next(){
+		var menu model.Menu
+		rows.Scan(&menu.Id_menu, &menu.Nama_menu, &menu.Harga, &menu.Deskripsi, &menu.Jenis, &menu.Foto, &menu.Nama_toko)
+
+		data.datastore = append(data.datastore, menu)
+	}
+
+	path, _ := os.Getwd()
+	t, err := template.ParseFiles(path+`\backend\views\layout.html`,path+`\backend\views\menu.html`)
+	if err != nil{
+		log.Fatal(err)
+	}
+
+	tmp := map[string]interface{}{
+    	"Id_user" : data.Id_user,
+    	"datastore" : data.datastore,
+    }
+	t.Execute(w, tmp)
+}
+
+func (as *AkunStore) DetailTokoHandler(w http.ResponseWriter, r *http.Request){
+	db := connectDb()
+	id := r.URL.Query()["id"][0]
+
+	rows, err := db.Query(`SELECT id_toko, nama_toko, alamat, foto_toko, deskripsi, jam_operasional FROM daftar_toko WHERE id_toko = ?`,id)
+	if err != nil{
+		log.Fatal(err)
+	}
+
+	var toko model.Toko
+	for rows.Next(){
+		rows.Scan(&toko.Id_toko, &toko.Nama_toko, &toko.Alamat, &toko.Foto, &toko.Deskripsi, &toko.JamOperasional)
+		fmt.Println(toko.Nama_toko)
+	}
+
+	path, _ := os.Getwd()
+	t, err := template.ParseFiles(path+`\backend\views\layout.html`,path+`\backend\views\detail_toko.html`)
+	if err != nil{
+		log.Fatal(err)
+	}
+
+	t.Execute(w, toko)
+}
+
 func (as *AkunStore) HomeHandler(w http.ResponseWriter, r *http.Request){
 	store := sessions.NewCookieStore([]byte("super-secret"))
 	session, err := store.Get(r, "session-name")
-	data := DataStore{}
+	data := DataTokoStore{}
 
 	data.Id_user = session.Values["id_user"].(int)
 
 	db := connectDb()
-	rows, _ := db.Query(`SELECT nama_toko, id_toko, alamat, foto, id_user FROM daftar_toko`)
+	rows, _ := db.Query(`SELECT nama_toko, id_toko, alamat, foto_toko, id_user FROM daftar_toko`)
 	
 	for rows.Next(){
 		var toko model.Toko
@@ -121,7 +229,7 @@ func (as *AkunStore) HomeHandler(w http.ResponseWriter, r *http.Request){
 	if err != nil{
 		log.Fatal(err)
 	}
-    fmt.Println(data.Id_user)
+
     tmp := map[string]interface{}{
     	"Id_user" : data.Id_user,
     	"datastore" : data.datastore,
