@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"database/sql"
 	"html/template"
+	"strconv"
 	// "strconv"
 	// "github.com/gorilla/mux"
 	"github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/model"
@@ -126,12 +127,13 @@ func (as *AkunStore) DetailMenu(w http.ResponseWriter, r *http.Request){
 		data.datastore = append(data.datastore, menu)
 	}
 
-	rows, _ = db.Query(`SELECT id_user, nama_komentar, isi_komentar FROM komentar WHERE id_menu = ?`, id_menu)	
+	rows, _ = db.Query(`SELECT id_komentar, id_user, nama_komentar, isi_komentar FROM komentar WHERE id_menu = ?`, id_menu)	
 
 	for rows.Next(){
 		var komentar model.Komentar
-		rows.Scan(&komentar.IdUser, &komentar.NamaKomentar, &komentar.IsiKomentar)
-
+		rows.Scan(&komentar.Id_komentar, &komentar.IdUser, &komentar.NamaKomentar, &komentar.IsiKomentar)
+		komentar.SessionIdUser = session.Values["id_user"].(int)
+		komentar.IdMenu, _ = strconv.Atoi(id_menu)
 		data.komentar = append(data.komentar, komentar)
 	}
 
@@ -145,6 +147,7 @@ func (as *AkunStore) DetailMenu(w http.ResponseWriter, r *http.Request){
     	"Id_user" : data.Id_user,
     	"datastore" : data.datastore,
     	"komentar" : data.komentar,
+    	"id_menu" : id_menu,
     }
 	err = t.Execute(w, tmp)
 	if err != nil{
@@ -357,4 +360,36 @@ func (as *AkunStore) EditPassword(w http.ResponseWriter, r *http.Request){
 		db.Query("UPDATE user SET password = ? WHERE id_user = ?", pwBaru, id)
 	}
 	http.Redirect(w, r, "/akun/pengaturan/edit/?id="+id , http.StatusSeeOther)
+}
+
+func (as *AkunStore) TambahKomentar(w http.ResponseWriter, r *http.Request){
+	store := sessions.NewCookieStore([]byte("super-secret"))
+	session, err := store.Get(r, "session-name")
+	if err != nil{
+		log.Fatal(err)
+	}
+
+	id_user := session.Values["id_user"].(int)
+	id_menu := r.URL.Query()["id"][0]
+	komentar := r.FormValue("isi_komentar")
+
+	db := connectDb()
+	rows, err := db.Query("SELECT username FROM user WHERE `id_user` = ?",id_user)
+	var nama string
+	for rows.Next(){
+		rows.Scan(&nama)
+	}
+
+	db.Query("INSERT INTO komentar (nama_komentar, isi_komentar, id_user, id_menu) VALUES (?,?,?,?)",nama,komentar,id_user,id_menu)
+
+	http.Redirect(w, r, "/menu/detail/?id="+id_menu, http.StatusSeeOther)
+}
+func (as *AkunStore) HapusKomentar(w http.ResponseWriter, r *http.Request){
+	id_komentar := r.URL.Query()["id_komentar"][0]
+	id_menu := r.URL.Query()["id_menu"][0]
+
+	db := connectDb()
+	db.Query("DELETE FROM komentar WHERE id_komentar = ?",id_komentar)
+
+	http.Redirect(w, r, "/menu/detail/?id="+id_menu, http.StatusSeeOther)
 }

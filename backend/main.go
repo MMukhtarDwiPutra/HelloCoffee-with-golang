@@ -35,12 +35,15 @@ func main(){
 	router.HandleFunc("/toko/", dataAkun.DetailTokoHandler)
 	router.HandleFunc("/menu", dataAkun.MenuHandler)
 	router.HandleFunc("/menu/detail/", dataAkun.DetailMenu)
+	router.HandleFunc("/komentar/tambahKomentar/", dataAkun.TambahKomentar)
+	router.HandleFunc("/komentar/hapusKomentar/", dataAkun.HapusKomentar)
 
-	// http.Handle("/css/", http.StripPrefix("C:/Users/USER/Desktop/Pemrograman/Golang/HelloCoffee-with-golang/backend/views/css/", http.FileServer(http.Dir("C:/Users/USER/Desktop/Pemrograman/Golang/HelloCoffee-with-golang/backend/views/css"))))
-
+	path, _ := os.Getwd()
+	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(path+`\backend\assets`))))
+    
 	log.Println("SERVER is running at port 8080")
 	err := http.ListenAndServe(":8080", router)
-	if err == nil{
+	if err != nil{
 		log.Fatal(err)
 	}
 }

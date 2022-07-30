@@ -18,4 +18,6 @@ type DataAkun interface{
 	DetailTokoHandler(w http.ResponseWriter, r *http.Request)
 	MenuHandler(w http.ResponseWriter, r *http.Request)
 	DetailMenu(w http.ResponseWriter, r *http.Request)
+	TambahKomentar(w http.ResponseWriter, r *http.Request)
+	HapusKomentar(w http.ResponseWriter, r *http.Request)
 }
