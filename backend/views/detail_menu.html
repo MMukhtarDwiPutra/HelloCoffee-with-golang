@@ -60,7 +60,7 @@ height: 100%;">
 						</div>
 						<hr>
 						<button type="submit" onclick="submitForm('')" class="btn btn btn-primary text-uppercase mt-3 mr-2"> Buy now </a>
-						<button type="submit" onclick="submitForm('')" class="btn btn btn-outline-primary text-uppercase mt-3"> Add to cart </button>
+						<button type="submit" onclick="submitForm('/keranjang/tambahKeranjang/?id={{$.id_menu}}')" class="btn btn btn-outline-primary text-uppercase mt-3"> Add to cart </button>
 					</article> <!-- card-body.// -->
 				</form>
 			</aside> <!-- col.// -->
@@ -87,7 +87,7 @@ height: 100%;">
 		<dl class="item-property">
 			<p class="m-4" style="font-size:14px;color: grey"> Oleh: <a href="" style="color:black;font-size: 17px; font-style: italic;" > {{.NamaKomentar}} </a></p>
 			<p class="ml-3" style="font-size: 20px;">'{{.IsiKomentar}}'</p>
-			{{if eq .IdUser .SessionIdUser}}
+			{{if eq .IdUser $.Id_user}}
 			<a href="/komentar/hapusKomentar/?id_komentar={{.Id_komentar}}&id_menu={{.IdMenu}}" type="" name="tambah" class="btn btn-danger mr-3" style="float: right;">Hapus Komentar</a>
 			{{end}}
 		</dl>

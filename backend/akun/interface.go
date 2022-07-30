@@ -20,4 +20,7 @@ type DataAkun interface{
 	DetailMenu(w http.ResponseWriter, r *http.Request)
 	TambahKomentar(w http.ResponseWriter, r *http.Request)
 	HapusKomentar(w http.ResponseWriter, r *http.Request)
+	KeranjangHandler(w http.ResponseWriter, r *http.Request)
+	TambahKeranjang(w http.ResponseWriter, r *http.Request)
+	HapusKeranjang(w http.ResponseWriter, r *http.Request)
 }

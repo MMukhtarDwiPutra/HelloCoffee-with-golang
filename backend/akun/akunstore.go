@@ -393,3 +393,74 @@ func (as *AkunStore) HapusKomentar(w http.ResponseWriter, r *http.Request){
 
 	http.Redirect(w, r, "/menu/detail/?id="+id_menu, http.StatusSeeOther)
 }
+
+func (as *AkunStore) KeranjangHandler(w http.ResponseWriter, r *http.Request){
+	id := r.URL.Query()["id"][0]
+
+	db := connectDb()
+
+	rows, err := db.Query("SELECT k.id_keranjang, k.qty, k.id_user, m.harga, m.nama_menu FROM keranjang k JOIN menu m ON k.id_menu = m.id_menu WHERE k.id_user = ?",id)
+	if err != nil{
+		log.Fatal(err)
+	}
+
+	var data []model.Keranjang
+	i := 1
+	for rows.Next(){
+		var k model.Keranjang
+		rows.Scan(&k.IdKeranjang, &k.Qty, &k.IdUser, &k.Harga, &k.NamaMenu)
+		k.No = i
+		i++
+		data = append(data, k)
+	}
+
+	path, _ := os.Getwd()
+	t, err := template.ParseFiles(path+`\backend\views\layout.html`,path+`\backend\views\keranjang.html`)
+	if err != nil{
+		log.Fatal(err)
+	}
+
+	tmp := map[string]interface{}{
+		"Id_user" : id,
+		"keranjang" : data,
+	}
+
+	err = t.Execute(w, tmp)
+	if err != nil{
+		log.Fatal(err)
+	}
+}
+
+func (as *AkunStore) TambahKeranjang(w http.ResponseWriter, r *http.Request){
+	id_menu := r.URL.Query()["id"][0]
+	store := sessions.NewCookieStore([]byte("super-secret"))
+	session, err := store.Get(r, "session-name")
+	if err != nil{
+		log.Fatal(err)
+	}
+
+	id_user := session.Values["id_user"].(int)
+	qty := r.FormValue("jumlah")
+
+	db := connectDb()
+	rows, _ := db.Query("SELECT harga FROM menu WHERE id_menu = ?",id_menu)
+	
+	var harga int
+	for rows.Next(){
+		rows.Scan(&harga)
+	}
+
+	db.Query("INSERT INTO keranjang (qty, id_menu, id_user) VALUES (?, ?, ?)",qty, id_menu, id_user)
+
+	http.Redirect(w, r, "/menu", http.StatusSeeOther)
+}
+
+func (as *AkunStore) HapusKeranjang(w http.ResponseWriter, r *http.Request){
+	id := r.URL.Query()["id"][0]
+
+	db := connectDb()
+
+	db.Query("DELETE FROM keranjang WHERE id_user = ?",id)
+
+	http.Redirect(w,r,"/menu", http.StatusSeeOther)
+}
