@@ -42,6 +42,12 @@ func main(){
 	router.HandleFunc("/keranjang/hapusSemua/", dataAkun.HapusKeranjang)
 	router.HandleFunc("/keranjang/checkout/", dataAkun.CheckoutHandler)
 	router.HandleFunc("/checkout/process/", dataAkun.CheckoutProcess)
+	router.HandleFunc("/home/toko", dataAkun.HomeTokoHandler)
+	router.HandleFunc("/menu/edit/", dataAkun.EditMenuHandler)
+	router.HandleFunc("/menu/hapus/",dataAkun.DeleteMenu)
+	router.HandleFunc("/menu/tambahMenu", dataAkun.TambahMenuHandler)
+	router.HandleFunc("/menu/tambahMenu/process", dataAkun.TambahMenuProcess)
+	router.HandleFunc("/menu/edit/process/", dataAkun.EditMenuProcess)
 
 	path, _ := os.Getwd()
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(path+`\backend\assets`))))

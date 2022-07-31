@@ -1,0 +1,39 @@
+{{template "layout" .}}
+{{define "main"}}
+<section class="padding-lg" style="background: url('https://images.unsplash.com/photo-1447933601403-0c6688de566e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=956&q=80');">
+	<div class="container">
+		<div class="row mt-3 col card text-dark">
+			<div class="card-header text-center">
+				Edit Menu {{.Nama_menu}}
+			</div>
+			<div class="card-body">
+				<form class="form-signin" method="POST" action="/menu/edit/process/?id={{$.Menu.Id_menu}}">
+					<div class="form-label-group">
+						<input type="text" name="nama_menu" id="nama_menu" class="form-control" value="{{$.Menu.Nama_menu}}">
+						<label for="nama_menu">Nama Menu</label>
+						<small class="form-text text-danger">{{$.Menu.Nama_menu}}</small>
+					</div>
+					<div class="form-label-group">
+						<input type="text" name="harga" id="harga" class="form-control" value="{{$.Menu.Harga}}">
+						<label for="harga">Harga</label>
+						<small class="form-text text-danger">{{$.Menu.Harga}}</small>
+					</div>
+					<div class="form-label-group">
+						<input type="text" name="deskripsi" id="deskripsi" class="form-control" value="{{$.Menu.Deskripsi}}">
+						<label for="deskripsi">Deskripsi</label>
+						<small class="form-text text-danger">{{$.Menu.Deskripsi}}</small>
+					</div>
+					<div class="form-label-group">
+						<input type="text" name="jenis" id="jenis" class="form-control" value="{{$.Menu.Jenis}}">
+						<label for="jenis">Jenis</label>
+						<small class="form-text text-danger">{{$.Menu.Jenis}}</small>
+					</div>
+					<button type="submit" class="btn btn-block btn-primary" onclick="return confirm('Apakah data yang dimasukan sudah benar?')">Edit Menu</button>
+					<a href="/menu/editFoto//?id={{$.Menu.Id_menu}}" class="btn btn-block btn-secondary">Edit Foto</a>
+					<a href="/home/toko" class="btn btn-block btn-danger pt-3" onclick="return confirm('Apakah anda serius? Data yang telah anda masukan akan hilang!');">Kembali</a>
+				</form>
+			</div>
+		</div>
+	</div>
+</section>
+{{end}}

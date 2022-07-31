@@ -53,7 +53,7 @@ func (as *AkunStore) LoginHandler(w http.ResponseWriter, r *http.Request){
 
 	db := connectDb()
 
-	rows, err := db.Query(`SELECT id_user FROM user WHERE email = ? and password = ?`,email, password)
+	rows, err := db.Query(`SELECT id_user, id_toko FROM user WHERE email = ? and password = ?`,email, password)
 	if err != nil{
 		panic(err.Error())
 	}
@@ -61,17 +61,24 @@ func (as *AkunStore) LoginHandler(w http.ResponseWriter, r *http.Request){
 	store := sessions.NewCookieStore([]byte("super-secret"))
 	session, _ := store.Get(r, "session-name")
 	
+	id_toko := -1
 	for rows.Next(){
 		var id_user int
-		rows.Scan(&id_user)
+		rows.Scan(&id_user, &id_toko)
 		session.Values["id_user"] = id_user
     	session.Save(r, w)
-    	fmt.Println(id_user)
-		http.Redirect(w, r, "/home",http.StatusSeeOther)
-	}		
+	}
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
-	
+	fmt.Println(id_toko)
+	if(id_toko == 0){
+		http.Redirect(w, r, "/home",http.StatusSeeOther)
+	}else if(id_toko == -1){
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	}else{
+		session.Values["id_toko"] = id_toko
+		session.Save(r, w)
+		http.Redirect(w, r, "/home/toko", http.StatusSeeOther)
+	}
 }
 
 func (as *AkunStore) RegisterNewAccount(w http.ResponseWriter, r *http.Request){
@@ -156,6 +163,84 @@ func (as *AkunStore) DetailMenu(w http.ResponseWriter, r *http.Request){
 	}
 }
 
+func (as *AkunStore) DeleteMenu (w http.ResponseWriter, r *http.Request){
+	id := r.URL.Query()["id"][0]
+
+	db := connectDb()
+	db.Query("DELETE FROM menu WHERE id_menu = ?",id)
+
+	http.Redirect(w, r, "/home/toko", http.StatusSeeOther)
+}
+
+func (as *AkunStore) TambahMenuProcess (w http.ResponseWriter, r *http.Request){
+	store := sessions.NewCookieStore([]byte("super-secret"))
+	session, _ := store.Get(r, "session-name")
+	id_toko := session.Values["id_toko"]
+	nama := r.FormValue("nama_menu")
+	harga := r.FormValue("harga")
+	deskripsi := r.FormValue("deskripsi")
+	jenis := r.FormValue("jenis")
+
+	db := connectDb()
+	db.Query("INSERT INTO menu (nama_menu, harga, deskripsi, jenis, id_toko) VALUES (?, ?, ?, ?, ?)",nama, harga, deskripsi, jenis, id_toko)
+
+	http.Redirect(w, r, "/home/toko", http.StatusSeeOther)
+}
+
+func (as *AkunStore) EditMenuProcess (w http.ResponseWriter, r *http.Request){
+	id := r.URL.Query()["id"][0]
+	nama := r.FormValue("nama_menu")
+	harga := r.FormValue("harga")
+	deskripsi := r.FormValue("deskripsi")
+	jenis := r.FormValue("jenis")
+
+	db := connectDb()
+	db.Query("UPDATE menu SET nama_menu = ?, harga = ?, deskripsi = ?, jenis = ? WHERE id_menu = ?",nama, harga, deskripsi, jenis, id)
+
+	http.Redirect(w, r, "/home/toko", http.StatusSeeOther)
+}
+
+func (as *AkunStore) TambahMenuHandler (w http.ResponseWriter, r *http.Request){
+	store := sessions.NewCookieStore([]byte("super-secret"))
+	session, _ := store.Get(r, "session-name")
+	data := map[string]interface{}{
+		"Id_user" : session.Values["id_user"],
+	}
+
+	path, _ := os.Getwd()
+	t, _ := template.ParseFiles(path+`\backend\views\layout.html`,path+`\backend\views\tambah_menu.html`)
+	err := t.Execute(w, data)
+	if err != nil{
+		log.Fatal(err)
+	}
+}
+
+func (as *AkunStore) EditMenuHandler (w http.ResponseWriter, r *http.Request){
+	id := r.URL.Query()["id"][0]
+
+	db := connectDb()
+	rows, _ := db.Query("SELECT id_menu, nama_menu, harga, deskripsi, jenis FROM menu WHERE id_menu = ?",id)
+	var m model.Menu
+	for rows.Next(){
+		rows.Scan(&m.Id_menu, &m.Nama_menu, &m.Harga, &m.Deskripsi, &m.Jenis)
+	}
+
+	data := map[string]interface{}{
+		"Id_user" : id,
+		"Menu" : m,
+	}
+
+	path, _ := os.Getwd()
+	t, err := template.ParseFiles(path+`\backend\views\layout_toko.html`,path+`\backend\views\edit_menu.html`)
+	if err != nil{
+		log.Fatal(err)
+	}
+	err = t.Execute(w, data)
+	if err != nil{
+		log.Fatal(err)
+	}
+}
+
 func (as *AkunStore) MenuHandler(w http.ResponseWriter, r *http.Request){
 	store := sessions.NewCookieStore([]byte("super-secret"))
 	session, err := store.Get(r, "session-name")
@@ -209,6 +294,38 @@ func (as *AkunStore) DetailTokoHandler(w http.ResponseWriter, r *http.Request){
 	}
 
 	t.Execute(w, toko)
+}
+
+func (as *AkunStore) HomeTokoHandler (w http.ResponseWriter, r *http.Request){
+	store := sessions.NewCookieStore([]byte("super-secret"))
+	session, err := store.Get(r, "session-name")
+	id_user := session.Values["id_user"].(int)
+	id_toko := session.Values["id_toko"].(int)
+
+	var data []model.Menu
+
+	db := connectDb()
+	rows, _ := db.Query("SELECT id_menu, nama_menu, harga, jenis FROM menu WHERE id_toko = ?",id_toko)
+	for rows.Next(){
+		var m model.Menu
+		rows.Scan(&m.Id_menu, &m.Nama_menu, &m.Harga, &m.Jenis)
+
+		data = append(data, m)
+	}
+
+	tmp := map[string]interface{}{
+		"Menu" : data,
+		"Id_user" : id_user,
+		"Id_toko" : id_toko,
+	}
+
+	path, _ := os.Getwd()
+	t, err := template.ParseFiles(path+`\backend\views\layout_toko.html`,path+`\backend\views\home_toko.html`)
+	if err != nil{
+		log.Fatal(err)
+	}
+
+	t.Execute(w, tmp)
 }
 
 func (as *AkunStore) HomeHandler(w http.ResponseWriter, r *http.Request){
@@ -278,19 +395,16 @@ func (as *AkunStore) SettingHandler(w http.ResponseWriter, r *http.Request){
 	}
 
 	path, _ := os.Getwd()
-	t, err := template.ParseFiles(path+`\backend\views\layout.html`,path+`\backend\views\akun.html`)
-	if err != nil{
-		log.Fatal(err)
-	}
-
-
 	tmp := map[string]interface{}{
 		"Akun" : data,
 		"Transaksi" : transaksi,
 	}
-	err = t.Execute(w, tmp)
-	if err != nil{
-		log.Fatal(err)
+	if(data.Id_toko == 0){
+		t, _ := template.ParseFiles(path+`\backend\views\layout.html`,path+`\backend\views\akun.html`)
+		t.Execute(w, tmp)	
+	}else{
+		t, _ := template.ParseFiles(path+`\backend\views\layout_toko.html`,path+`\backend\views\akun.html`)
+		t.Execute(w, tmp)
 	}
 }
 

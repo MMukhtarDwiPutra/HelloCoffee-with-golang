@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Hello Coffee - The 1st Online Coffee Shop</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+  <!-- <link rel="stylesheet" href="css/bootstrap.min.css" />
+ -->  <link rel="shortcut icon" href="<?php echo base_url('assets/img/coffee9.jpg') ?>">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+</head>
+
+<body>
+
+  <div id="navbar" class="wrapper sticky-top">
+         <header>
+            <nav>
+               <div class="menu-icon">
+                  <i class="fa fa-bars fa-2x"></i>
+               </div>
+               <div class="logo">
+                  HELLOCOFFEE
+               </div>
+               <div class="menu text-uppercase">
+                  <ul>
+                     <li><a href="/home/toko">Home</a></li>
+                     <li><a href="/akun/pengaturan/?id={{.Id_user}}">akun</a></li>
+                     <li><a href="">Team</a><li>
+                     <li><a href="/transaksiToko/?id={{.Id_toko}}">Transaksi Toko</a><li>
+                     <li><a href="/logout">Logout</a></li>
+
+                  </ul>
+               </div>
+            </nav>
+         </header>
+      </div>
+
+      {{template "main" .}}
+
+      <footer class="footer">
+      <table width="100%" >  
+            <th></th>
+            <th> 
+            <a href="<?php echo base_url('About/') ?>">About</a><br>
+            <a href="<?php echo base_url('Team/') ?>">Our Team</a><br>
+            <a href="<?php echo base_url('FAQ/') ?>">FAQ</a>
+            </th>
+            <th>  
+                  <div class="container text-center"><a class="cc-facebook btn btn-link" href="#"><i class="fa fa-facebook fa-2x " aria-hidden="true"></i></a><a class="cc-twitter btn btn-link " href="#"><i class="fa fa-twitter fa-2x " aria-hidden="true"></i></a><a class="cc-google-plus btn btn-link" href="#"><i class="fa fa-google-plus fa-2x" aria-hidden="true"></i></a><a class="cc-instagram btn btn-link" href="#"><i class="fa fa-instagram fa-2x " aria-hidden="true"></i></a></div>
+                  <div class="h4 title text-center">Hello Coffee</div>
+                  <div class="text-center text-muted">
+                  <p>&copy; Hello coffee. All rights reserved.</p>
+                  </div>
+            </th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+      </table>
+</footer>
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+<script> $(document).ready(function() {
+   $(".menu-icon").on("click", function() {
+      $("nav ul").toggleClass("showing");
+   });
+});
+
+      // Scrolling Effect
+
+      $(window).on("scroll", function() {
+         if($(window).scrollTop()) {
+            $('nav').addClass('black');
+         }
+
+         else {
+            $('nav').removeClass('black');
+         }
+      })</script>
+
+
+</body>
+</html>

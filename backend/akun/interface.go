@@ -25,4 +25,10 @@ type DataAkun interface{
 	HapusKeranjang(w http.ResponseWriter, r *http.Request)
 	CheckoutHandler (w http.ResponseWriter, r *http.Request)
 	CheckoutProcess (w http.ResponseWriter, r *http.Request)
+	HomeTokoHandler (w http.ResponseWriter, r *http.Request)
+	DeleteMenu (w http.ResponseWriter, r *http.Request)
+	EditMenuHandler (w http.ResponseWriter, r *http.Request)
+	TambahMenuHandler (w http.ResponseWriter, r *http.Request)	
+	TambahMenuProcess (w http.ResponseWriter, r *http.Request)
+	EditMenuProcess (w http.ResponseWriter, r *http.Request)
 }
