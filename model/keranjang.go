@@ -7,4 +7,6 @@ type Keranjang struct{
 	Qty int `db:"qty"`
 	IdUser int `db:"id_user"`
 	Harga int `db:"harga"`
+	Total int
+	IdMenu int `db:"id_menu"`
 }

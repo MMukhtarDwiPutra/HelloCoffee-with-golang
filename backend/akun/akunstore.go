@@ -13,6 +13,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/sessions"
 	"os"
+	"time"
 )
 
 type DataTokoStore struct{
@@ -265,13 +266,29 @@ func (as *AkunStore) SettingHandler(w http.ResponseWriter, r *http.Request){
 		rows.Scan(&data.Id_user, &data.Username, &data.Email, &data.Gender, &data.Id_toko)
 	}
 
+	var transaksi []model.Transaksi
+	rows, _ = db.Query("SELECT t.tanggal_transaksi, t.qty, m.harga, m.nama_menu, t.status_transaksi FROM transaksi t JOIN menu m ON t.id_menu = m.id_menu WHERE t.id_user = ?",id)
+	for rows.Next(){
+		var t model.Transaksi
+		var harga int
+		rows.Scan(&t.TanggalTransaksi, &t.Qty, &harga, &t.NamaMenu, &t.StatusTransaksi)
+		t.Harga = harga * t.Qty
+
+		transaksi = append(transaksi, t)
+	}
+
 	path, _ := os.Getwd()
 	t, err := template.ParseFiles(path+`\backend\views\layout.html`,path+`\backend\views\akun.html`)
 	if err != nil{
 		log.Fatal(err)
 	}
 
-	err = t.Execute(w, data)
+
+	tmp := map[string]interface{}{
+		"Akun" : data,
+		"Transaksi" : transaksi,
+	}
+	err = t.Execute(w, tmp)
 	if err != nil{
 		log.Fatal(err)
 	}
@@ -463,4 +480,71 @@ func (as *AkunStore) HapusKeranjang(w http.ResponseWriter, r *http.Request){
 	db.Query("DELETE FROM keranjang WHERE id_user = ?",id)
 
 	http.Redirect(w,r,"/menu", http.StatusSeeOther)
+}
+
+func (as *AkunStore) CheckoutHandler (w http.ResponseWriter, r *http.Request){
+	path, _ := os.Getwd()
+	t, err := template.ParseFiles(path+`\backend\views\layout.html`,path+`\backend\views\checkout.html`)
+	if err != nil{
+		log.Fatal(err)
+	}
+
+	id := r.URL.Query()["id"][0]
+	db := connectDb()
+
+
+	rows, err := db.Query("SELECT k.id_keranjang, k.qty, k.id_user, m.harga, m.nama_menu FROM keranjang k JOIN menu m ON k.id_menu = m.id_menu WHERE k.id_user = ?",id)
+	totalAll := 0
+	var data []model.Keranjang
+	for rows.Next(){
+		var k model.Keranjang
+		rows.Scan(&k.IdKeranjang, &k.Qty, &k.IdUser, &k.Harga, &k.NamaMenu)
+		k.Total = k.Qty * k.Harga
+		data = append(data, k)
+		totalAll = totalAll + k.Total
+	}
+
+	tmp := map[string]interface{}{
+		"Id_user" : id,
+		"Keranjang" : data,
+		"TotalAll" : totalAll,
+	}
+
+	err = t.Execute(w, tmp)
+	if err != nil{
+		log.Fatal(err)
+	}
+}
+
+func (as *AkunStore) CheckoutProcess (w http.ResponseWriter, r *http.Request){
+	id := r.URL.Query()["id"][0]
+	fullName := r.FormValue("fname")
+	email := r.FormValue("email")
+	address := r.FormValue("address")
+	city := r.FormValue("city")
+	zip := r.FormValue("zip")
+	state := r.FormValue("state")
+
+	db := connectDb()
+	db.Query("INSERT INTO detail_transaksi (full_name, email, address, city, zip, state) VALUES (?, ?, ?, ?, ?, ?) ",fullName, email, address, city, zip, state)
+	row, _ := db.Query("SELECT id_detail_transaksi FROM detail_transaksi ORDER BY id_detail_transaksi DESC LIMIT 1")
+
+	var id_detail_transaksi int
+	for row.Next(){
+		row.Scan(&id_detail_transaksi)
+		fmt.Println(id_detail_transaksi)
+	}
+
+	currentTime := time.Now()
+	tanggal := currentTime.Format("2006-01-02")
+
+	rows, _ := db.Query("SELECT id_keranjang, qty, id_user, id_menu FROM keranjang WHERE id_user = ?",id)
+	for rows.Next(){
+		var k model.Keranjang
+		rows.Scan(&k.IdKeranjang, &k.Qty, &k.IdUser, &k.IdMenu)
+		db.Query(`INSERT INTO transaksi (tanggal_transaksi, qty, id_user, id_menu, id_detail_transaksi, status_transaksi) VALUES (?, ?, ?, ?, ?, "Baru")`, tanggal, k.Qty, k.IdUser, k.IdMenu, id_detail_transaksi)
+		db.Query("DELETE FROM keranjang WHERE id_keranjang = ?", k.IdKeranjang)
+	}
+
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }

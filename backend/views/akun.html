@@ -6,11 +6,14 @@
     </div>
     <div class="container emp-profile">
         <form method="post" action="">
+            <?php foreach ($users as $user) : {
+                # code...
+            } ?>
             <div class="row">
                 <div class="col-md-4">
                     <div class="profile-img">
-                        <img src="http://www.webcoderskull.com/img/team4.png" alt=""/>
-
+                        <img src="<?php echo site_url('assets/img/'.$user['Foto']) ?>" style="border-radius: 50%; object-fit: cover; width:230px; height: 230px;"/>
+                        <a class="btn btn-block btn-primary mt-3" href="<?php echo base_url('akun/editFoto/'.$user['id_user']) ?>">Edit Foto</a>
                     </div>
                 </div>
                 <div class="col-md-8">
@@ -20,7 +23,7 @@
                             Selamat datang {{.Username}}!
                         </h5>
                         <h6>
-                            Status : User
+                            Status : 
                         </h6>
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
                             <li class="nav-item">
@@ -38,7 +41,7 @@
                                     <label>User Id</label>
                                 </div>
                                 <div class="col-md-6">
-                                    <label>{{.Id_user}}</label>
+                                    <label>{{$.Akun.Id_user}}</label>
                                 </div>
                             </div>
                             <div class="row">
@@ -46,7 +49,7 @@
                                     <label>Name</label>
                                 </div>
                                 <div class="col-md-6">
-                                    <label>{{.Username}}</label>
+                                    <label>{{$.Akun.Username}}</label>
                                 </div>
                             </div>
                             <div class="row">
@@ -54,7 +57,7 @@
                                     <label>Email</label>
                                 </div>
                                 <div class="col-md-6">
-                                    <label>{{.Email}}</label>
+                                    <label>{{$.Akun.Email}}</label>
                                 </div>
                             </div>
                             <div class="row">
@@ -62,28 +65,61 @@
                                     <label>Gender</label>
                                 </div>
                                 <div class="col-md-6">
-                                    <label>{{.Gender}}</label>
+                                    <label>{{$.Akun.Gender}}</label>
                                 </div>
                             </div>
                         </div>
                         <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                             <div class="row">
-                                <div class="col-md-6">
-                                    <label>Kagatau mau diisi apaan</label>
+                                <div class="col-md-3">
+                                    <p>Tanggal Pembelian</p>
                                 </div>
-                                <div class="col-md-6">
-                                    <p>Test</p>
+                                <div class="col-md-2">
+                                    <p>Nama Kopi</p>
+                                </div>
+                                <div class="col-md-2">
+                                    <p>Jumlah</p>
+                                </div>
+                                <div class="col-md-2">
+                                    <p>Harga Total</p>
+                                </div>
+                                <div class="col-md-3">
+                                    <p>Status</p>
                                 </div>
                             </div>
+
+                            {{range .Transaksi}}
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label>{{.TanggalTransaksi}}</label>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label>{{.NamaMenu}}</label>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label>{{.Qty}}</label>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label>{{.Harga}}</label>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label>
+                                        {{if eq .StatusTransaksi "Baru"}}
+                                            Menunggu konfirmasi..
+                                        {{else}}
+                                            {{.StatusTransaksi}}
+                                        {{end}}</label>
+                                    </div>
+                                </div>
+                            {{end}}
                             
                         </div>
                         <hr>    
-                        <a href="/akun/pengaturan/edit/?id={{.Id_user}}" class="btn btn-primary float-right  ">Edit Akun</a>
-                        <a href="deleteAkun/?id={{.Id_user}}" class="btn btn-danger float-right mr-3 ">Delete Akun</a>
+                        <a href="/akun/pengaturan/edit/?id={{$.Akun.Id_user}}" class="btn btn-primary float-right  ">Edit Akun</a>
+                        <a href="/akun/pengaturan/deleteAkun/?id={{$.Akun.Id_user}}" onclick="return confirm('Apakah anda yakin menghapus data ini?');" class="btn btn-danger float-right mr-3 ">Delete Akun</a>
                     </div>
                 </div>
             </div>
-    
         </form>           
     </div>
 </section>

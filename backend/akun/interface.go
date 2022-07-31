@@ -23,4 +23,6 @@ type DataAkun interface{
 	KeranjangHandler(w http.ResponseWriter, r *http.Request)
 	TambahKeranjang(w http.ResponseWriter, r *http.Request)
 	HapusKeranjang(w http.ResponseWriter, r *http.Request)
+	CheckoutHandler (w http.ResponseWriter, r *http.Request)
+	CheckoutProcess (w http.ResponseWriter, r *http.Request)
 }
