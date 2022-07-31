@@ -114,6 +114,25 @@ func (as *AkunStore) RegisterHandler(w http.ResponseWriter, r *http.Request){
 	}	
 }
 
+func (as *AkunStore) ProcessTransaksi(w http.ResponseWriter, r *http.Request){
+	id_toko := r.URL.Query()["id_toko"][0]
+	id_transaksi := r.URL.Query()["id_transaksi"][0]
+	pesanan := r.URL.Query()["pesanan"][0]
+
+	db := connectDb()
+
+	status := "Baru"
+	if pesanan == "diterima"{
+		status = "Success"
+	}else if pesanan == "ditolak"{
+		status = "Pesanan ditolak"
+	}
+
+	db.Query("UPDATE transaksi SET status_transaksi = ? WHERE id_transaksi = ?",status,id_transaksi)
+
+	http.Redirect(w, r, "/transaksi/?id="+id_toko, http.StatusSeeOther)
+}
+
 func (as *AkunStore) DetailMenu(w http.ResponseWriter, r *http.Request){
 	store := sessions.NewCookieStore([]byte("super-secret"))
 	session, err := store.Get(r, "session-name")
@@ -170,6 +189,44 @@ func (as *AkunStore) DeleteMenu (w http.ResponseWriter, r *http.Request){
 	db.Query("DELETE FROM menu WHERE id_menu = ?",id)
 
 	http.Redirect(w, r, "/home/toko", http.StatusSeeOther)
+}
+
+func (as *AkunStore) TransaksiHandler (w http.ResponseWriter, r *http.Request){
+	id_toko := r.URL.Query()["id"][0]
+	store := sessions.NewCookieStore([]byte("super-secret"))
+	session, _ := store.Get(r, "session-name")
+	id_user := session.Values["id_user"]
+
+	db := connectDb()
+	rows, err := db.Query(`SELECT t.id_transaksi, t.tanggal_transaksi, dt.full_name, dt.email, dt.address, dt.city, dt.zip, dt.state, t.Qty, m.Harga, m.foto_kopi, m.nama_menu FROM detail_transaksi dt JOIN transaksi t ON t.id_detail_transaksi = dt.id_detail_transaksi JOIN menu m ON m.id_menu = t.id_menu WHERE id_toko = ? and t.status_transaksi = "Baru"`,id_toko)
+	if err != nil{
+		log.Fatal(err)
+	}
+
+	var data []model.Transaksi
+	for rows.Next(){
+		var t model.Transaksi
+		rows.Scan(&t.IdTransaksi, &t.TanggalTransaksi, &t.Nama, &t.Email, &t.Address, &t.City, &t.Zip, &t.State, &t.Qty, &t.Harga, &t.Foto, &t.NamaMenu)
+		t.Harga = t.Qty * t.Harga
+		fmt.Println(t.IdTransaksi)
+		data = append(data, t)
+	}
+
+	path, _ := os.Getwd()
+	t, err := template.ParseFiles(path+`\backend\views\layout_toko.html`,path+`\backend\views\transaksi.html`)
+	if err != nil{
+		log.Fatal(err)
+	}
+
+	tmp := map[string]interface{}{
+		"Id_user" : id_user,
+		"Id_toko" : id_toko,
+		"Transaksi" : data,
+	}
+	err = t.Execute(w, tmp)
+	if err != nil{
+		log.Fatal(err)
+	}
 }
 
 func (as *AkunStore) TambahMenuProcess (w http.ResponseWriter, r *http.Request){

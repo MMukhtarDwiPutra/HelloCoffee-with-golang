@@ -7,4 +7,11 @@ type Transaksi struct{
 	NamaMenu string `db:"nama_menu"`
 	Harga int
 	StatusTransaksi string `db:"status_transaksi"`
+	Nama string
+	Email string
+	Address string
+	State string
+	Zip string
+	City string
+	Foto string
 }

@@ -31,4 +31,6 @@ type DataAkun interface{
 	TambahMenuHandler (w http.ResponseWriter, r *http.Request)	
 	TambahMenuProcess (w http.ResponseWriter, r *http.Request)
 	EditMenuProcess (w http.ResponseWriter, r *http.Request)
+	TransaksiHandler (w http.ResponseWriter, r *http.Request)
+	ProcessTransaksi(w http.ResponseWriter, r *http.Request)
 }

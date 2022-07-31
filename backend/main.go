@@ -48,6 +48,8 @@ func main(){
 	router.HandleFunc("/menu/tambahMenu", dataAkun.TambahMenuHandler)
 	router.HandleFunc("/menu/tambahMenu/process", dataAkun.TambahMenuProcess)
 	router.HandleFunc("/menu/edit/process/", dataAkun.EditMenuProcess)
+	router.HandleFunc("/transaksi/", dataAkun.TransaksiHandler)
+	router.HandleFunc("/transaksi/process/", dataAkun.ProcessTransaksi)
 
 	path, _ := os.Getwd()
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(path+`\backend\assets`))))
