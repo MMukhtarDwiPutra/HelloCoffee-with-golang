@@ -21,7 +21,7 @@
                 {{ range .keranjang}}
                     <tr >
                         <td >{{.No}} </td>
-                        <td ><img src ="<?php echo base_url('assets/img/'); echo $data['foto_kopi'];?>"></td>
+                        <td ><img src ="/static/img/{{.Foto}}"></td>
                         <td >{{.NamaMenu}}</td>
                         <td >Rp. {{.Harga}}</td>
                         <td ><input type="text" class="form-control input-sm" name=""  value="{{.Qty}}" /></td> 

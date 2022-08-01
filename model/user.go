@@ -6,4 +6,5 @@ type User struct{
 	Email string `json:"email" db:"email"`
 	Gender string `json:"gender" db:"gender"`
 	Id_toko int `json:"id_toko" db:"id_toko"`
+	Foto string `db:"foto_kopi"`
 }

@@ -50,9 +50,11 @@ func main(){
 	router.HandleFunc("/menu/edit/process/", dataAkun.EditMenuProcess)
 	router.HandleFunc("/transaksi/", dataAkun.TransaksiHandler)
 	router.HandleFunc("/transaksi/process/", dataAkun.ProcessTransaksi)
+	router.HandleFunc("/keranjang/checkOutNow/", dataAkun.CheckoutNowHandler)
 
 	path, _ := os.Getwd()
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(path+`\backend\assets`))))
+	router.PathPrefix("/static/img/").Handler(http.StripPrefix("/static/img/", http.FileServer(http.Dir(path+`\backend\assets\img`))))
     
 	log.Println("SERVER is running at port 8080")
 	err := http.ListenAndServe(":8080", router)

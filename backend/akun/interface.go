@@ -33,4 +33,5 @@ type DataAkun interface{
 	EditMenuProcess (w http.ResponseWriter, r *http.Request)
 	TransaksiHandler (w http.ResponseWriter, r *http.Request)
 	ProcessTransaksi(w http.ResponseWriter, r *http.Request)
+	CheckoutNowHandler(w http.ResponseWriter, r *http.Request)
 }

@@ -15,7 +15,7 @@ height: 100%;">
 				<article class="gallery-wrap"> 
 					<div class="img-big-wrap">
 
-						<div> <a href="#"><img src="<?php echo base_url('assets/img/').$kopi['foto_kopi'] ?>" ></a></div>
+						<div> <a href="#"><img src="/static/img/{{.Foto}}" ></a></div>
 					</div> <!-- slider-product.// -->
 				</article> <!-- gallery-wrap .end// -->
 			</aside>
@@ -59,7 +59,7 @@ height: 100%;">
 							</div>
 						</div>
 						<hr>
-						<button type="submit" onclick="submitForm('')" class="btn btn btn-primary text-uppercase mt-3 mr-2"> Buy now </a>
+						<button type="submit" onclick="submitForm('/keranjang/checkOutNow/?id={{$.id_menu}}')" class="btn btn btn-primary text-uppercase mt-3 mr-2"> Buy now </a>
 						<button type="submit" onclick="submitForm('/keranjang/tambahKeranjang/?id={{$.id_menu}}')" class="btn btn btn-outline-primary text-uppercase mt-3"> Add to cart </button>
 					</article> <!-- card-body.// -->
 				</form>

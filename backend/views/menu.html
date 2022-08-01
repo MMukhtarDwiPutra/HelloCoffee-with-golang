@@ -20,20 +20,20 @@
 								<article class="card-wrapper text-dark text-center">
 
 										<div class="image-holder">	
-											<!-- <a href="<?php echo base_url('Detail_produk/') ?>" class="image-holder__link"></a>
+											<a href="<?php echo base_url('Detail_produk/') ?>" class="image-holder__link"></a>
 
 											<div class="image-liquid image-holder--original"
-											style="background-image: url('{{.Foto}})"> -->
-										<!-- </div> -->
+											style="background-image: url('/static/img/{{.Foto}}')">
+										</div>
 									</div>
 									<div class="product-description">
 										<!-- title -->
 										<div class="card-body pt-1 pb-1">
 											<h5 class="card-title mb-3">{{.Nama_menu}}</h5>
 											<hr class="mb-2 mt-0">
-											<p class="card-text">Harga = {{.Harga}}</p>
-											<p class="card-text">Jenis = {{.Jenis}}</p>
-											<p class="card-text">Kedai = {{.Nama_toko}}</p>
+											<p class="card-text">Harga : {{.Harga}}</p>
+											<p class="card-text">Jenis : {{.Jenis}}</p>
+											<p class="card-text">Kedai : {{.Nama_toko}}</p>
 										</div>
 										<a href="/menu/detail/?id={{.Id_menu}}" class="btn btn-success float-right font-weight-bold">Detail</a>
 									</div>

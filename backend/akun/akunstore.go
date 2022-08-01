@@ -89,7 +89,7 @@ func (as *AkunStore) RegisterNewAccount(w http.ResponseWriter, r *http.Request){
 
 	db := connectDb()
 
-	insert, err := db.Query("INSERT INTO user (username, password, email, gender) VALUES (? , ?, ?, ?) ", username, password, email, gender)
+	insert, err := db.Query(`INSERT INTO user (username, password, email, gender, Foto) VALUES (?, ?, ?, ?, "kopi.png") `, username, password, email, gender)
 	if err != nil{
 		log.Fatal(err)
 	}
@@ -131,6 +131,30 @@ func (as *AkunStore) ProcessTransaksi(w http.ResponseWriter, r *http.Request){
 	db.Query("UPDATE transaksi SET status_transaksi = ? WHERE id_transaksi = ?",status,id_transaksi)
 
 	http.Redirect(w, r, "/transaksi/?id="+id_toko, http.StatusSeeOther)
+}
+
+func (as *AkunStore) CheckoutNowHandler(w http.ResponseWriter, r *http.Request){
+	id_menu := r.URL.Query()["id"][0]
+	store := sessions.NewCookieStore([]byte("super-secret"))
+	session, err := store.Get(r, "session-name")
+	if err != nil{
+		log.Fatal(err)
+	}
+
+	id_user := session.Values["id_user"].(int)
+	qty := r.FormValue("jumlah")
+
+	db := connectDb()
+	rows, _ := db.Query("SELECT harga FROM menu WHERE id_menu = ?",id_menu)
+	
+	var harga int
+	for rows.Next(){
+		rows.Scan(&harga)
+	}
+
+	db.Query("INSERT INTO keranjang (qty, id_menu, id_user) VALUES (?, ?, ?)",qty, id_menu, id_user)
+
+	http.Redirect(w, r, "/keranjang/checkout/?id="+strconv.Itoa(id_user), http.StatusSeeOther)
 }
 
 func (as *AkunStore) DetailMenu(w http.ResponseWriter, r *http.Request){
@@ -362,10 +386,10 @@ func (as *AkunStore) HomeTokoHandler (w http.ResponseWriter, r *http.Request){
 	var data []model.Menu
 
 	db := connectDb()
-	rows, _ := db.Query("SELECT id_menu, nama_menu, harga, jenis FROM menu WHERE id_toko = ?",id_toko)
+	rows, _ := db.Query("SELECT id_menu, nama_menu, harga, jenis, foto_kopi FROM menu WHERE id_toko = ?",id_toko)
 	for rows.Next(){
 		var m model.Menu
-		rows.Scan(&m.Id_menu, &m.Nama_menu, &m.Harga, &m.Jenis)
+		rows.Scan(&m.Id_menu, &m.Nama_menu, &m.Harga, &m.Jenis, &m.Foto)
 
 		data = append(data, m)
 	}
@@ -430,14 +454,14 @@ func (as *AkunStore) SettingHandler(w http.ResponseWriter, r *http.Request){
 
 	db := connectDb()
 
-	rows, err:= db.Query(`SELECT id_user, username, email, gender, id_toko FROM user WHERE id_user = ?`,id)
+	rows, err:= db.Query(`SELECT id_user, username, email, gender, id_toko, Foto FROM user WHERE id_user = ?`,id)
 	if err != nil{
 		log.Fatal(err)
 	}
 
 	var data model.User
 	for rows.Next(){
-		rows.Scan(&data.Id_user, &data.Username, &data.Email, &data.Gender, &data.Id_toko)
+		rows.Scan(&data.Id_user, &data.Username, &data.Email, &data.Gender, &data.Id_toko, &data.Foto)
 	}
 
 	var transaksi []model.Transaksi
@@ -453,6 +477,7 @@ func (as *AkunStore) SettingHandler(w http.ResponseWriter, r *http.Request){
 
 	path, _ := os.Getwd()
 	tmp := map[string]interface{}{
+		"Id_user" : id,
 		"Akun" : data,
 		"Transaksi" : transaksi,
 	}
@@ -587,7 +612,7 @@ func (as *AkunStore) KeranjangHandler(w http.ResponseWriter, r *http.Request){
 
 	db := connectDb()
 
-	rows, err := db.Query("SELECT k.id_keranjang, k.qty, k.id_user, m.harga, m.nama_menu FROM keranjang k JOIN menu m ON k.id_menu = m.id_menu WHERE k.id_user = ?",id)
+	rows, err := db.Query("SELECT k.id_keranjang, k.qty, k.id_user, m.harga, m.nama_menu, m.foto_kopi FROM keranjang k JOIN menu m ON k.id_menu = m.id_menu WHERE k.id_user = ?",id)
 	if err != nil{
 		log.Fatal(err)
 	}
@@ -596,7 +621,7 @@ func (as *AkunStore) KeranjangHandler(w http.ResponseWriter, r *http.Request){
 	i := 1
 	for rows.Next(){
 		var k model.Keranjang
-		rows.Scan(&k.IdKeranjang, &k.Qty, &k.IdUser, &k.Harga, &k.NamaMenu)
+		rows.Scan(&k.IdKeranjang, &k.Qty, &k.IdUser, &k.Harga, &k.NamaMenu, &k.Foto)
 		k.No = i
 		i++
 		data = append(data, k)
