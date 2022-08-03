@@ -2,17 +2,17 @@ package main
 
 import (
 	"database/sql"
-	// "embed"
-	// "io/fs"
 	"log"
 	"net/http"
+	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/backend/akun"
 	"github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/backend/toko"
 	"github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/backend/menu"
 	"github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/backend/komentar"
 	"github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/backend/handler"
-	// "github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/model"
+	"github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/backend/transaksi"
+	"github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/backend/keranjang"
 	// "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"os"
@@ -24,25 +24,29 @@ func main(){
 		log.Fatal(err)
 	}
 
-	akunRepository := akun.NewRepository(db)
-	akunService := akun.NewService(akunRepository)
-	akunHandler := handler.NewAkunHandler(akunService)
-
-	tokoRepository := toko.NewRepository(db)
-	tokoService := toko.NewService(tokoRepository)
-	tokoHandler := handler.NewTokoHandler(tokoService)
+	transaksiRepository := transaksi.NewRepository(db)
+	transaksiService := transaksi.NewService(transaksiRepository)
 
 	komentarRepository := komentar.NewRepository(db)
 	komentarService := komentar.NewService(komentarRepository)
 
+	akunRepository := akun.NewRepository(db)
+	akunService := akun.NewService(akunRepository)
+	akunHandler := handler.NewAkunHandler(akunService, transaksiService, komentarService)
+
 	menuRepository := menu.NewRepository(db)
 	menuService := menu.NewService(menuRepository)
 	menuHandler := handler.NewMenuHandler(menuService, komentarService)
+	
+	tokoRepository := toko.NewRepository(db)
+	tokoService := toko.NewService(tokoRepository, menuRepository)
+	tokoHandler := handler.NewTokoHandler(tokoService)
+
+	keranjangRepository := keranjang.NewRepository(db)
+	keranjangService := keranjang.NewService(keranjangRepository, transaksiRepository)
+	keranjangHandler := handler.NewKeranjangHandler(keranjangService)
 
 	router := mux.NewRouter()
-
-	var dataAkun akun.DataAkun
-	dataAkun = akun.NewDataAkun()
 
 	router.HandleFunc("/akun/login", akunHandler.LoginProcess)
 	router.HandleFunc("/akun/register", akunHandler.RegisterHandler)
@@ -51,6 +55,7 @@ func main(){
 
 	router.HandleFunc("/home", tokoHandler.HomeHandler)
 	router.HandleFunc("/toko/", tokoHandler.DetailTokoHandler)
+	router.HandleFunc("/home/toko", tokoHandler.HomeTokoHandler)
 
 	router.HandleFunc("/menu", menuHandler.MenuHandler)
 	router.HandleFunc("/menu/detail/", menuHandler.DetailMenu)
@@ -60,24 +65,26 @@ func main(){
 	router.HandleFunc("/menu/hapus/", menuHandler.DeleteMenu)
 	router.HandleFunc("/menu/edit/process/", menuHandler.EditMenuProcess)
 
-	router.HandleFunc("/akun/pengaturan/", dataAkun.SettingHandler)
-	router.HandleFunc("/logout", dataAkun.LogoutHandler)
-	router.HandleFunc("/akun/pengaturan/deleteAkun/", dataAkun.DeleteAkun)
-	router.HandleFunc("/akun/pengaturan/edit/", dataAkun.EditAkunHandler)
-	router.HandleFunc("/akun/pengaturan/edit/process/",dataAkun.EditAkun)
-	router.HandleFunc("/akun/pengaturan/edit/password/", dataAkun.EditPasswordHandler)
-	router.HandleFunc("/akun/pengaturan/edit/password/process/",dataAkun.EditPassword)
-	router.HandleFunc("/komentar/tambahKomentar/", dataAkun.TambahKomentar)
-	router.HandleFunc("/komentar/hapusKomentar/", dataAkun.HapusKomentar)
-	router.HandleFunc("/keranjang/", dataAkun.KeranjangHandler)
-	router.HandleFunc("/keranjang/tambahKeranjang/", dataAkun.TambahKeranjang)
-	router.HandleFunc("/keranjang/hapusSemua/", dataAkun.HapusKeranjang)
-	router.HandleFunc("/keranjang/checkout/", dataAkun.CheckoutHandler)
-	router.HandleFunc("/checkout/process/", dataAkun.CheckoutProcess)
-	router.HandleFunc("/home/toko", dataAkun.HomeTokoHandler)
-	router.HandleFunc("/transaksi/", dataAkun.TransaksiHandler)
-	router.HandleFunc("/transaksi/process/", dataAkun.ProcessTransaksi)
-	router.HandleFunc("/keranjang/checkOutNow/", dataAkun.CheckoutNowHandler)
+	router.HandleFunc("/akun/pengaturan/", akunHandler.SettingHandler)
+	router.HandleFunc("/logout", akunHandler.LogoutHandler)
+	router.HandleFunc("/akun/pengaturan/deleteAkun/", akunHandler.DeleteAkun)
+	router.HandleFunc("/akun/pengaturan/edit/", akunHandler.EditAkunHandler)
+	router.HandleFunc("/akun/pengaturan/edit/process/",akunHandler.EditAkun)
+	router.HandleFunc("/akun/pengaturan/edit/password/", akunHandler.EditPasswordHandler)
+	router.HandleFunc("/akun/pengaturan/edit/password/process/",akunHandler.EditPassword)
+
+	router.HandleFunc("/komentar/tambahKomentar/", akunHandler.TambahKomentar)
+	router.HandleFunc("/komentar/hapusKomentar/", akunHandler.HapusKomentar)
+
+	router.HandleFunc("/transaksi/", akunHandler.TransaksiHandler)
+	router.HandleFunc("/transaksi/process/", akunHandler.ProcessTransaksi)
+	
+	router.HandleFunc("/keranjang/", keranjangHandler.KeranjangHandler)
+	router.HandleFunc("/keranjang/tambahKeranjang/", keranjangHandler.TambahKeranjang)
+	router.HandleFunc("/keranjang/hapusSemua/", keranjangHandler.HapusKeranjang)
+	router.HandleFunc("/keranjang/checkout/", keranjangHandler.CheckoutHandler)
+	router.HandleFunc("/checkout/process/", keranjangHandler.CheckoutProcess)
+	router.HandleFunc("/keranjang/checkOutNow/", keranjangHandler.CheckoutNowHandler)
 
 	path, _ := os.Getwd()
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(path+`\backend\assets`))))

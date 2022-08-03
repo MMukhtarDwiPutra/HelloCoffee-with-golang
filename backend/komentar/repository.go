@@ -8,6 +8,8 @@ import(
 
 type Repository interface{
 	FindAllKomentar(id_menu int, id_user int) []model.Komentar
+	AddKomentar(komentar string, id_user int, id_menu int)
+	DeleteKomentar(id_komentar int)
 }
 
 type repository struct{
@@ -36,3 +38,19 @@ func (r *repository) FindAllKomentar(id_menu int, id_user int) []model.Komentar{
 	return komentars
 }
 
+func (r *repository) AddKomentar(komentar string, id_user int, id_menu int){
+	rows, err := r.db.Query("SELECT username FROM user WHERE `id_user` = ?",id_user)
+	if err != nil{
+		log.Fatal(err)
+	}
+	var nama string
+	for rows.Next(){
+		rows.Scan(&nama)
+	}
+
+	r.db.Query("INSERT INTO komentar (nama_komentar, isi_komentar, id_user, id_menu) VALUES (?,?,?,?)",nama,komentar,id_user,id_menu)
+}
+
+func (r *repository) DeleteKomentar(id_komentar int){
+	r.db.Query("DELETE FROM komentar WHERE id_komentar = ?",id_komentar)
+}

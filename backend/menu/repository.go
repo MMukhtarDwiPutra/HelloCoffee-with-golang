@@ -12,6 +12,7 @@ type Repository interface{
 	CreateMenu(nama string, harga int, deskripsi string, jenis string, id_toko int)
 	DeleteMenu(id_menu int)
 	UpdateMenu(nama string, harga int, deskripsi string, jenis string, id int)
+	FindAllMenuFromToko(id_toko int) []model.Menu
 }
 
 type repository struct{
@@ -20,6 +21,23 @@ type repository struct{
 
 func NewRepository(db *sql.DB) *repository{
 	return &repository{db}
+}
+
+func (r *repository) FindAllMenuFromToko(id_toko int) []model.Menu{
+	rows, err := r.db.Query("SELECT id_menu, nama_menu, harga, jenis, foto_kopi FROM menu WHERE id_toko = ?",id_toko)
+	if err != nil{
+		log.Fatal(err)
+	}
+
+	var data []model.Menu
+	for rows.Next(){
+		var m model.Menu
+		rows.Scan(&m.Id_menu, &m.Nama_menu, &m.Harga, &m.Jenis, &m.Foto)
+
+		data = append(data, m)
+	}
+
+	return data
 }
 
 func (r *repository) FindAllMenu() []model.Menu{

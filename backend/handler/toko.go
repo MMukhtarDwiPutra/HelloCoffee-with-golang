@@ -18,6 +18,31 @@ func NewTokoHandler(tokoService toko.Service) *tokoHandler{
 	return &tokoHandler{tokoService}
 }
 
+func (h *tokoHandler) HomeTokoHandler (w http.ResponseWriter, r *http.Request){
+	store := sessions.NewCookieStore([]byte("super-secret"))
+	session, err := store.Get(r, "session-name")
+	id_user := session.Values["id_user"].(int)
+	id_toko := session.Values["id_toko"].(int)
+
+	data := h.tokoService.FindAllMenuFromToko(id_toko)
+
+	tmp := map[string]interface{}{
+		"Menu" : data,
+		"Id_user" : id_user,
+		"Id_toko" : id_toko,
+	}
+
+	path, _ := os.Getwd()
+	t, err := template.ParseFiles(path+`\backend\views\layout_toko.html`,path+`\backend\views\home_toko.html`)
+	if err != nil{
+		log.Fatal(err)
+	}
+
+	t.Execute(w, tmp)
+}
+
+
+
 func (h *tokoHandler) HomeHandler(w http.ResponseWriter, r *http.Request){
 	store := sessions.NewCookieStore([]byte("super-secret"))
 	session, err := store.Get(r, "session-name")
