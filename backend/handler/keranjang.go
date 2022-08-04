@@ -10,15 +10,15 @@ import(
 	"strconv"
 )
 
-type keranjangHandler struct{
+type KeranjangHandler struct{
 	keranjangService keranjang.Service
 }
 
-func NewKeranjangHandler(keranjangService keranjang.Service) *keranjangHandler{
-	return &keranjangHandler{keranjangService}
+func NewKeranjangHandler(keranjangService keranjang.Service) *KeranjangHandler{
+	return &KeranjangHandler{keranjangService}
 }
 
-func (h *keranjangHandler) KeranjangHandler(w http.ResponseWriter, r *http.Request){
+func (h *KeranjangHandler) KeranjangHandler(w http.ResponseWriter, r *http.Request){
 	id := r.URL.Query()["id"][0]
 	id_user, _ := strconv.Atoi(id)
 
@@ -41,7 +41,7 @@ func (h *keranjangHandler) KeranjangHandler(w http.ResponseWriter, r *http.Reque
 	}
 }
 
-func (h *keranjangHandler) TambahKeranjang(w http.ResponseWriter, r *http.Request){
+func (h *KeranjangHandler) TambahKeranjang(w http.ResponseWriter, r *http.Request){
 	id_menu_string := r.URL.Query()["id"][0]
 	id_menu, _ := strconv.Atoi(id_menu_string)
 	store := sessions.NewCookieStore([]byte("super-secret"))
@@ -59,7 +59,7 @@ func (h *keranjangHandler) TambahKeranjang(w http.ResponseWriter, r *http.Reques
 	http.Redirect(w, r, "/menu", http.StatusSeeOther)
 }
 
-func (h *keranjangHandler) HapusKeranjang(w http.ResponseWriter, r *http.Request){
+func (h *KeranjangHandler) HapusKeranjang(w http.ResponseWriter, r *http.Request){
 	id := r.URL.Query()["id"][0]
 	id_user, _ := strconv.Atoi(id)
 	
@@ -68,7 +68,7 @@ func (h *keranjangHandler) HapusKeranjang(w http.ResponseWriter, r *http.Request
 	http.Redirect(w,r,"/menu", http.StatusSeeOther)
 }
 
-func (h *keranjangHandler) CheckoutHandler (w http.ResponseWriter, r *http.Request){
+func (h *KeranjangHandler) CheckoutHandler (w http.ResponseWriter, r *http.Request){
 	path, _ := os.Getwd()
 	t, err := template.ParseFiles(path+`\backend\views\layout.html`,path+`\backend\views\checkout.html`)
 	if err != nil{
@@ -92,7 +92,7 @@ func (h *keranjangHandler) CheckoutHandler (w http.ResponseWriter, r *http.Reque
 	}
 }
 
-func (h *keranjangHandler) CheckoutProcess (w http.ResponseWriter, r *http.Request){
+func (h *KeranjangHandler) CheckoutProcess (w http.ResponseWriter, r *http.Request){
 	id := r.URL.Query()["id"][0]
 	id_user, _ := strconv.Atoi(id)
 	fullName := r.FormValue("fname")
@@ -107,7 +107,7 @@ func (h *keranjangHandler) CheckoutProcess (w http.ResponseWriter, r *http.Reque
 	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
 
-func (h *keranjangHandler) CheckoutNowHandler(w http.ResponseWriter, r *http.Request){
+func (h *KeranjangHandler) CheckoutNowHandler(w http.ResponseWriter, r *http.Request){
 	id_menu_string := r.URL.Query()["id"][0]
 	id_menu, _ := strconv.Atoi(id_menu_string)
 	store := sessions.NewCookieStore([]byte("super-secret"))

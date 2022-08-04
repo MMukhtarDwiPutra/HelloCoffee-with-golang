@@ -10,15 +10,15 @@ import (
 	"strconv"
 )
 
-type tokoHandler struct{
+type TokoHandler struct{
 	tokoService toko.Service
 }
 
-func NewTokoHandler(tokoService toko.Service) *tokoHandler{
-	return &tokoHandler{tokoService}
+func NewTokoHandler(tokoService toko.Service) *TokoHandler{
+	return &TokoHandler{tokoService}
 }
 
-func (h *tokoHandler) HomeTokoHandler (w http.ResponseWriter, r *http.Request){
+func (h *TokoHandler) HomeTokoHandler (w http.ResponseWriter, r *http.Request){
 	store := sessions.NewCookieStore([]byte("super-secret"))
 	session, err := store.Get(r, "session-name")
 	id_user := session.Values["id_user"].(int)
@@ -43,7 +43,7 @@ func (h *tokoHandler) HomeTokoHandler (w http.ResponseWriter, r *http.Request){
 
 
 
-func (h *tokoHandler) HomeHandler(w http.ResponseWriter, r *http.Request){
+func (h *TokoHandler) HomeHandler(w http.ResponseWriter, r *http.Request){
 	store := sessions.NewCookieStore([]byte("super-secret"))
 	session, err := store.Get(r, "session-name")
 
@@ -67,7 +67,7 @@ func (h *tokoHandler) HomeHandler(w http.ResponseWriter, r *http.Request){
 	}
 }
 
-func (h *tokoHandler) DetailTokoHandler(w http.ResponseWriter, r *http.Request){
+func (h *TokoHandler) DetailTokoHandler(w http.ResponseWriter, r *http.Request){
 	idString := r.URL.Query()["id"][0]
 	id, _ := strconv.Atoi(idString)
 

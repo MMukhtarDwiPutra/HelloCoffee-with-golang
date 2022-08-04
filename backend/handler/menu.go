@@ -11,16 +11,16 @@ import(
 	"strconv"
 )
 
-type menuHandler struct{
+type MenuHandler struct{
 	menuService menu.Service
 	komentarService komentar.Service
 }
 
-func NewMenuHandler (menuService menu.Service, komentarService komentar.Service) *menuHandler{
-	return &menuHandler{menuService, komentarService}
+func NewMenuHandler (menuService menu.Service, komentarService komentar.Service) *MenuHandler{
+	return &MenuHandler{menuService, komentarService}
 }
 
-func (h *menuHandler) MenuHandler(w http.ResponseWriter, r *http.Request){
+func (h *MenuHandler) MenuHandler(w http.ResponseWriter, r *http.Request){
 	store := sessions.NewCookieStore([]byte("super-secret"))
 	session, err := store.Get(r, "session-name")
 	
@@ -41,7 +41,7 @@ func (h *menuHandler) MenuHandler(w http.ResponseWriter, r *http.Request){
 	t.Execute(w, tmp)
 }
 
-func (h *menuHandler) DetailMenu(w http.ResponseWriter, r *http.Request){
+func (h *MenuHandler) DetailMenu(w http.ResponseWriter, r *http.Request){
 	store := sessions.NewCookieStore([]byte("super-secret"))
 	session, err := store.Get(r, "session-name")
 
@@ -72,7 +72,7 @@ func (h *menuHandler) DetailMenu(w http.ResponseWriter, r *http.Request){
 	}
 }
 
-func (h *menuHandler) EditMenuHandler (w http.ResponseWriter, r *http.Request){
+func (h *MenuHandler) EditMenuHandler (w http.ResponseWriter, r *http.Request){
 	idString := r.URL.Query()["id"][0]
 	id_menu, _ := strconv.Atoi(idString)
 
@@ -98,7 +98,7 @@ func (h *menuHandler) EditMenuHandler (w http.ResponseWriter, r *http.Request){
 	}
 }
 
-func (h *menuHandler) TambahMenuHandler (w http.ResponseWriter, r *http.Request){
+func (h *MenuHandler) TambahMenuHandler (w http.ResponseWriter, r *http.Request){
 	store := sessions.NewCookieStore([]byte("super-secret"))
 	session, _ := store.Get(r, "session-name")
 	data := map[string]interface{}{
@@ -113,7 +113,7 @@ func (h *menuHandler) TambahMenuHandler (w http.ResponseWriter, r *http.Request)
 	}
 }
 
-func (h *menuHandler) TambahMenuProcess (w http.ResponseWriter, r *http.Request){
+func (h *MenuHandler) TambahMenuProcess (w http.ResponseWriter, r *http.Request){
 	store := sessions.NewCookieStore([]byte("super-secret"))
 	session, _ := store.Get(r, "session-name")
 	id_toko := session.Values["id_toko"].(int)
@@ -123,13 +123,14 @@ func (h *menuHandler) TambahMenuProcess (w http.ResponseWriter, r *http.Request)
 	harga, _ := strconv.Atoi(hargaString)
 	deskripsi := r.FormValue("deskripsi")
 	jenis := r.FormValue("jenis")
+	foto_kopi := ""
 
-	h.menuService.CreateMenu(nama, harga, deskripsi, jenis, id_toko)
+	h.menuService.CreateMenu(nama, harga, deskripsi, jenis, id_toko, foto_kopi)
 
 	http.Redirect(w, r, "/home/toko", http.StatusSeeOther)
 }
 
-func (h *menuHandler) DeleteMenu (w http.ResponseWriter, r *http.Request){
+func (h *MenuHandler) DeleteMenu (w http.ResponseWriter, r *http.Request){
 	idString := r.URL.Query()["id"][0]
 	id, _ := strconv.Atoi(idString) 
 
@@ -138,7 +139,7 @@ func (h *menuHandler) DeleteMenu (w http.ResponseWriter, r *http.Request){
 	http.Redirect(w, r, "/home/toko", http.StatusSeeOther)
 }
 
-func (h *menuHandler) EditMenuProcess(w http.ResponseWriter, r *http.Request){
+func (h *MenuHandler) EditMenuProcess(w http.ResponseWriter, r *http.Request){
 	idString := r.URL.Query()["id"][0]
 	id_menu, _ := strconv.Atoi(idString)
 	nama := r.FormValue("nama_menu")

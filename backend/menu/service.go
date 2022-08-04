@@ -7,9 +7,9 @@ import (
 type Service interface{
 	FindAllMenu() []model.Menu
 	FindOneMenu(id_menu int) model.Menu
-	CreateMenu(nama string, harga int, deskripsi string, jenis string, id_toko int)
-	DeleteMenu(id_menu int)
-	UpdateMenu(nama string, harga int, deskripsi string, jenis string, id_menu int)
+	CreateMenu(nama string, harga int, deskripsi string, jenis string, id_toko int, foto_kopi string) model.Menu
+	DeleteMenu(id_menu int) model.Menu
+	UpdateMenu(nama string, harga int, deskripsi string, jenis string, id_menu int) model.Menu
 }
 
 type service struct{
@@ -28,14 +28,21 @@ func (s *service) FindOneMenu(id_menu int) model.Menu{
 	return s.repository.FindOneMenu(id_menu)
 }
 
-func (s *service) CreateMenu(nama string, harga int, deskripsi string, jenis string, id_toko int){
-	s.repository.CreateMenu(nama, harga, deskripsi, jenis, id_toko)
+func (s *service) CreateMenu(nama string, harga int, deskripsi string, jenis string, id_toko int, foto_kopi string) model.Menu{
+	s.repository.CreateMenu(nama, harga, deskripsi, jenis, id_toko, foto_kopi)
+	
+	return s.repository.GetLastMenu()
 }
 
-func (s *service) DeleteMenu(id_menu int){
+func (s *service) DeleteMenu(id_menu int) model.Menu{
+	menu := s.repository.FindOneMenu(id_menu)
 	s.repository.DeleteMenu(id_menu)
+
+	return menu
 }
 
-func (s *service) UpdateMenu(nama string, harga int, deskripsi string, jenis string, id_menu int){
+func (s *service) UpdateMenu(nama string, harga int, deskripsi string, jenis string, id_menu int) model.Menu{
 	s.repository.UpdateMenu(nama, harga, deskripsi, jenis, id_menu)
+	
+	return s.repository.FindOneMenu(id_menu)
 }
