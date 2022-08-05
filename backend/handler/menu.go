@@ -3,6 +3,7 @@ package handler
 import(
 	"github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/backend/menu"
 	"github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/backend/komentar"
+	"github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/model"
 	"net/http"
 	"log"
 	"os"
@@ -118,14 +119,16 @@ func (h *MenuHandler) TambahMenuProcess (w http.ResponseWriter, r *http.Request)
 	session, _ := store.Get(r, "session-name")
 	id_toko := session.Values["id_toko"].(int)
 
-	nama := r.FormValue("nama_menu")
-	hargaString := r.FormValue("harga")
-	harga, _ := strconv.Atoi(hargaString)
-	deskripsi := r.FormValue("deskripsi")
-	jenis := r.FormValue("jenis")
-	foto_kopi := ""
+	var menu model.Menu
+	menu.Nama_menu = r.FormValue("nama_menu")
+	harga, _ := strconv.Atoi(r.FormValue("harga"))
+	menu.Harga = harga
+	menu.Deskripsi = r.FormValue("deskripsi")
+	menu.Jenis = r.FormValue("jenis")
+	menu.Foto = ""
+	menu.Id_toko = id_toko
 
-	h.menuService.CreateMenu(nama, harga, deskripsi, jenis, id_toko, foto_kopi)
+	h.menuService.CreateMenu(menu)
 
 	http.Redirect(w, r, "/home/toko", http.StatusSeeOther)
 }
@@ -140,15 +143,19 @@ func (h *MenuHandler) DeleteMenu (w http.ResponseWriter, r *http.Request){
 }
 
 func (h *MenuHandler) EditMenuProcess(w http.ResponseWriter, r *http.Request){
+	var menu model.Menu
+
 	idString := r.URL.Query()["id"][0]
 	id_menu, _ := strconv.Atoi(idString)
-	nama := r.FormValue("nama_menu")
+	menu.Id_menu = id_menu
+	menu.Nama_menu = r.FormValue("nama_menu")
 	hargaString := r.FormValue("harga")
 	harga, _ := strconv.Atoi(hargaString)
-	deskripsi := r.FormValue("deskripsi")
-	jenis := r.FormValue("jenis")
+	menu.Harga = harga
+	menu.Deskripsi = r.FormValue("deskripsi")
+	menu.Jenis = r.FormValue("jenis")
 
-	h.menuService.UpdateMenu(nama, harga, deskripsi, jenis, id_menu)
+	h.menuService.UpdateMenu(menu)
 
 	http.Redirect(w, r, "/home/toko", http.StatusSeeOther)
 }

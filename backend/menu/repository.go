@@ -79,7 +79,10 @@ func (r *repository) FindOneMenu(id_menu int) model.Menu{
 }
 
 func (r *repository) CreateMenu(nama string, harga int, deskripsi string, jenis string, id_toko int, foto_kopi string){
-	r.db.Query("INSERT INTO menu (nama_menu, harga, deskripsi, jenis, id_toko, foto_kopi) VALUES (?, ?, ?, ?, ?, ?)",nama, harga, deskripsi, jenis, id_toko, foto_kopi)
+	_, err := r.db.Query("INSERT INTO menu (nama_menu, harga, deskripsi, jenis, id_toko, foto_kopi) VALUES (?, ?, ?, ?, ?, ?)",nama, harga, deskripsi, jenis, id_toko, foto_kopi)
+	if err != nil{
+		log.Fatal(err)
+	}
 }
 
 func (r *repository) DeleteMenu(id_menu int) {
@@ -93,12 +96,12 @@ func (r *repository) UpdateMenu(nama string, harga int, deskripsi string, jenis 
 func (r *repository) GetLastMenu() model.Menu{
 	var menu model.Menu
 
-	rows, err := r.db.Query("SELECT id_menu, nama_menu, harga, deskripsi, jenis, foto_kopi, id_toko FROM menu ORDER BY id_menu DESC LIMIT 1")
+	rows, err := r.db.Query("SELECT m.id_menu, m.nama_menu, m.harga, m.deskripsi, m.jenis, m.foto_kopi, m.id_toko, t.nama_toko FROM menu m JOIN daftar_toko t ORDER BY id_menu DESC LIMIT 1")
 	if err != nil{
 		log.Fatal(err)
 	}
 	for rows.Next(){
-		rows.Scan(&menu.Id_menu, &menu.Nama_menu, &menu.Harga, &menu.Deskripsi, &menu.Jenis, &menu.Foto, &menu.Id_toko)
+		rows.Scan(&menu.Id_menu, &menu.Nama_menu, &menu.Harga, &menu.Deskripsi, &menu.Jenis, &menu.Foto, &menu.Id_toko, &menu.Nama_toko)
 	}
 
 	return menu

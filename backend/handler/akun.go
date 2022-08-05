@@ -4,6 +4,7 @@ import (
 	"github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/backend/akun"
 	"github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/backend/transaksi"
 	"github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/backend/komentar"
+	"github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/model"
 	"net/http"
 	"github.com/gorilla/sessions"
 	"os"
@@ -33,10 +34,10 @@ func (h *AkunHandler) LoginProcess(w http.ResponseWriter, r *http.Request){
 
 	session.Values["id_user"] = id_user
 	session.Save(r, w)
-	if(id_toko == 0){
-		http.Redirect(w, r, "/home",http.StatusSeeOther)
-	}else if(id_toko == -1){
+	if(id_user == -1){
 		http.Redirect(w, r, "/", http.StatusSeeOther)
+	}else if(id_toko < 1){
+		http.Redirect(w, r, "/home",http.StatusSeeOther)
 	}else{
 		session.Values["id_toko"] = id_toko
 		session.Save(r, w)
@@ -45,12 +46,16 @@ func (h *AkunHandler) LoginProcess(w http.ResponseWriter, r *http.Request){
 }
 
 func (h *AkunHandler) RegisterNewAccount(w http.ResponseWriter, r *http.Request){
-	username := r.FormValue("username")
-	password := r.FormValue("password")
-	gender := r.FormValue("gender")
-	email := r.FormValue("email")
+	var u model.User
+	u.Username = r.FormValue("username")
+	u.Password = r.FormValue("password")
+	u.Gender = r.FormValue("gender")
+	u.Email = r.FormValue("email")
+	u.Nama = u.Username
+	u.Id_toko = 0
+	u.Foto = "kopi.png"
 
-	h.akunService.CreateAccount(username, password, email, gender)
+	h.akunService.CreateAccount(u)
 	
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
@@ -107,7 +112,7 @@ func (h *AkunHandler) SettingHandler(w http.ResponseWriter, r *http.Request){
 		"Akun" : data,
 		"Transaksi" : transaksi,
 	}
-	if(data.Id_toko == 0){
+	if(data.Id_toko < 1){
 		t, _ := template.ParseFiles(path+`\backend\views\layout.html`,path+`\backend\views\akun.html`)
 		t.Execute(w, tmp)	
 	}else{
@@ -152,13 +157,15 @@ func (h *AkunHandler) EditAkunHandler(w http.ResponseWriter, r *http.Request){
 }
 
 func (h *AkunHandler) EditAkun(w http.ResponseWriter, r *http.Request){
+	var akun model.User
 	id := r.URL.Query()["id"][0]
 	id_user, _ := strconv.Atoi(id)
-	nama := r.FormValue("nama")
-	email := r.FormValue("email")
-	gender := r.FormValue("gender")
+	akun.Id_user = id_user
+	akun.Nama = r.FormValue("nama")
+	akun.Email = r.FormValue("email")
+	akun.Gender = r.FormValue("gender")
 
-	h.akunService.UpdateAkun(nama, email, gender, id_user)
+	h.akunService.UpdateAkun(akun)
 
 	http.Redirect(w, r, "/akun/pengaturan/?id="+id , http.StatusSeeOther)
 }

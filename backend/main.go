@@ -15,7 +15,6 @@ import (
 	"github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/api/app"
 	"github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/api/helper"
 	"github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/backend/application"
-	// "github.com/gorilla/handlers"
 )
 
 func main(){
@@ -44,9 +43,10 @@ func main(){
 	keranjangHandler := handler.NewKeranjangHandler(keranjangService)
 
 	router := application.NewRouter(akunHandler, tokoHandler, menuHandler, keranjangHandler)
-	router = app.AddRouterAPI(router, menuService)
+	router = app.AddRouterAPI(router, menuService, akunService)
     
 	log.Println("SERVER is running at port 8080")
+
 	err := http.ListenAndServe(":8080", router)
 	helper.PanicIfError(err)
 }
