@@ -71,6 +71,11 @@ func (h *TokoHandler) DetailTokoHandler(w http.ResponseWriter, r *http.Request){
 	idString := r.URL.Query()["id"][0]
 	id, _ := strconv.Atoi(idString)
 
+	store := sessions.NewCookieStore([]byte("super-secret"))
+	session, err := store.Get(r, "session-name")
+
+	id_user := session.Values["id_user"].(int)
+
 	toko := h.tokoService.FindOneToko(id)
 
 	path, _ := os.Getwd()
@@ -78,6 +83,10 @@ func (h *TokoHandler) DetailTokoHandler(w http.ResponseWriter, r *http.Request){
 	if err != nil{
 		log.Fatal(err)
 	}
+	tmp := map[string]interface{}{
+		"toko" : toko,
+		"Id_user" : id_user,
+	}
 
-	t.Execute(w, toko)
+	t.Execute(w, tmp)
 }

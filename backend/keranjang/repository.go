@@ -4,6 +4,7 @@ import(
 	"database/sql"
 	"log"
 	"github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/model"
+	"github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/model/web"
 	"time"
 )
 
@@ -15,6 +16,11 @@ type Repository interface{
 	AddToTransaksi(tanggal string, k model.Keranjang, id_detail_transaksi int)
 	DeleteKeranjang(k model.Keranjang)
 	AddTransaksi(id_user int)
+	GetLastKeranjang() web.KeranjangResponse
+	GetKeranjangAPI(id_keranjang int) web.KeranjangResponse
+	UpdateKeranjangAPI(k web.CreateKeranjangRequest, id_keranjang int)
+	DeleteKeranjangAPI(id_keranjang int)
+	FindAllKeranjangAPI() []web.KeranjangResponse
 }
 
 type repository struct{
@@ -84,4 +90,60 @@ func (r *repository) AddTransaksi(id_user int){
 		r.AddToTransaksi(tanggal, k, id_detail_transaksi)
 		r.DeleteKeranjang(k)
 	}
+}
+
+func (r *repository) GetLastKeranjang() web.KeranjangResponse{
+	var k web.KeranjangResponse
+
+	rows, err := r.db.Query("SELECT k.id_keranjang, m.nama_menu, k.qty, k.id_user, m.harga, k.id_menu, m.foto_kopi FROM keranjang k JOIN menu m ON k.id_menu = m.id_menu ORDER BY id_keranjang DESC LIMIT 1")
+	if err != nil{
+		log.Fatal(err)
+	}
+	for rows.Next(){
+		rows.Scan(&k.IdKeranjang, &k.NamaMenu, &k.Qty, &k.IdUser, &k.Harga, &k.IdMenu, &k.Foto)
+		k.Total = k.Qty * k.Harga
+	}
+
+	return k
+}
+
+func (r *repository) GetKeranjangAPI(id_keranjang int) web.KeranjangResponse{
+	var k web.KeranjangResponse
+
+	rows, err := r.db.Query("SELECT k.id_keranjang, m.nama_menu, k.qty, k.id_user, m.harga, k.id_menu, m.foto_kopi FROM keranjang k JOIN menu m ON k.id_menu = m.id_menu WHERE id_keranjang = ?",id_keranjang)
+	if err != nil{
+		log.Fatal(err)
+	}
+	for rows.Next(){
+		rows.Scan(&k.IdKeranjang, &k.NamaMenu, &k.Qty, &k.IdUser, &k.Harga, &k.IdMenu, &k.Foto)
+		k.Total = k.Qty * k.Harga
+	}
+
+	return k
+}
+
+func (r *repository) UpdateKeranjangAPI(k web.CreateKeranjangRequest, id_keranjang int){
+	r.db.Query("UPDATE keranjang SET qty = ?, id_menu = ?, id_user = ? WHERE id_keranjang = ?",k.Qty, k.IdMenu, k.IdUser, id_keranjang)
+}
+
+func (r *repository)  DeleteKeranjangAPI(id_keranjang int){
+	r.db.Query("DELETE FROM keranjang WHERE id_keranjang = ? ",id_keranjang)
+}
+
+func (r *repository) FindAllKeranjangAPI() []web.KeranjangResponse{
+	var keranjang []web.KeranjangResponse
+
+	rows, err := r.db.Query("SELECT k.id_keranjang, m.nama_menu, k.qty, k.id_user, m.harga, k.id_menu, m.foto_kopi FROM keranjang k JOIN menu m WHERE k.id_menu = m.id_menu")
+	if err != nil{
+		log.Fatal(err)
+	}
+
+	for rows.Next(){
+		var k web.KeranjangResponse
+		rows.Scan(&k.IdKeranjang, &k.NamaMenu, &k.Qty, &k.IdUser, &k.Harga, &k.IdMenu, &k.Foto)
+		k.Total = k.Qty * k.Harga
+		keranjang = append(keranjang, k)
+	}
+
+	return keranjang
 }

@@ -4,6 +4,7 @@ import(
 	"database/sql"
 	"log"
 	"github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/model"
+	"github.com/MMukhtarDwiPutra/HelloCoffee-with-golang/model/web"
 )
 
 type Repository interface{
@@ -11,6 +12,8 @@ type Repository interface{
 	GetTransaksiToko(id_toko int) []model.Transaksi
 	UpdateStatusTransaksi(status string, id_transaksi int)
 	AddTransaksi(fullname string, email string, address string, city string, zip string, state string)
+	GetTransaksiAPI(id_transaksi int) web.TransaksiResponse
+	GetAllTransaksiAPI() []web.TransaksiResponse
 }
 
 type repository struct{
@@ -62,4 +65,40 @@ func (r *repository) UpdateStatusTransaksi(status string, id_transaksi int){
 
 func (r *repository) AddTransaksi(fullname string, email string, address string, city string, zip string, state string){
 	r.db.Query("INSERT INTO detail_transaksi (full_name, email, address, city, zip, state) VALUES (?, ?, ?, ?, ?, ?) ",fullname, email, address, city, zip, state)
+}
+
+func (r *repository) GetTransaksiAPI(id_transaksi int) web.TransaksiResponse{
+	var dt web.DetailTransaksiResponse
+	var t web.TransaksiResponse
+
+	rows, err := r.db.Query("SELECT t.id_transaksi, t.tanggal_transaksi, t.qty, m.nama_menu, m.harga, t.status_transaksi, dt.full_name, dt.email, dt.address, dt.state, dt.zip, dt.city FROM transaksi t JOIN menu m ON t.id_menu = m.id_menu JOIN detail_transaksi dt ON dt.id_detail_transaksi = t.id_detail_transaksi WHERE t.id_transaksi = ?", id_transaksi)
+	if err != nil{
+		log.Fatal(err)
+	}
+
+	for rows.Next(){
+		rows.Scan(&t.IdTransaksi, &t.TanggalTransaksi, &t.Qty, &t.NamaMenu, &t.Harga, &t.StatusTransaksi, &dt.Nama, &dt.Email, &dt.Address, &dt.State, &dt.Zip, &dt.City)
+		t.DetailTransaksi = dt
+	}
+
+	return t
+}
+
+func (r *repository) GetAllTransaksiAPI() []web.TransaksiResponse{
+	var transaksi []web.TransaksiResponse
+
+	rows, err := r.db.Query("SELECT t.id_transaksi, t.tanggal_transaksi, t.qty, m.nama_menu, m.harga, t.status_transaksi, dt.full_name, dt.email, dt.address, dt.state, dt.zip, dt.city FROM transaksi t JOIN menu m ON t.id_menu = m.id_menu JOIN detail_transaksi dt ON dt.id_detail_transaksi = t.id_detail_transaksi")
+	if err != nil{
+		log.Fatal(err)
+	}
+
+	for rows.Next(){
+		var dt web.DetailTransaksiResponse
+		var t web.TransaksiResponse
+		rows.Scan(&t.IdTransaksi, &t.TanggalTransaksi, &t.Qty, &t.NamaMenu, &t.Harga, &t.StatusTransaksi, &dt.Nama, &dt.Email, &dt.Address, &dt.State, &dt.Zip, &dt.City)
+		t.DetailTransaksi = dt
+		transaksi = append(transaksi, t)
+	}
+
+	return transaksi
 }

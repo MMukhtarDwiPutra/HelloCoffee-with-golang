@@ -43,7 +43,7 @@ func main(){
 	keranjangHandler := handler.NewKeranjangHandler(keranjangService)
 
 	router := application.NewRouter(akunHandler, tokoHandler, menuHandler, keranjangHandler)
-	router = app.AddRouterAPI(router, menuService, akunService)
+	router = app.AddRouterAPI(router, menuService, akunService, tokoService, keranjangService, transaksiService)
     
 	log.Println("SERVER is running at port 8080")
 
